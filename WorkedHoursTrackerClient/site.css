@@ -1,0 +1,44 @@
+body
+{
+    padding:0;
+    margin:0;
+}
+
+.btn-pin
+{
+    width: 60px;    
+    height: 60px;    
+    background:#dcdcdc;
+    outline: none;
+    border: none;
+}
+
+.btn-pin:hover
+{
+    background:#dcdcdc;
+    border: none;
+}
+
+.btn-pin:focus
+{
+    background:#dcdcdc;
+    text-decoration: none;
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.filter-active
+{
+    background: yellow;
+}
+
+.filter-active:focus
+{
+    background: yellow;
+}
+
+.actionlink
+{
+    cursor: pointer;    
+}

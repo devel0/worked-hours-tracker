@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="bower_components/bootstrap4/dist/css/bootstrap.min.css">
+
+  <!-- https://notifyjs.jpillora.com/ -->
+  <link rel="stylesheet" href="bower_components/notifyjs/dist/styles/metro/notify-metro.css">
+
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="bower_components/Font-Awesome/web-fonts-with-css/css/fontawesome-all.min.css">
+
+  <!-- https://leaverou.github.io/awesomplete/ -->
+  <link rel="stylesheet" href="bower_components/awesomplete/awesomplete.css">
+
+  <!-- Site css -->
+  <link rel="stylesheet" href="site.css">
+
+  <title>Worked Hours Tracker client</title>
+</head>
+
+<body>
+  <div class="container-fluid">
+
+    <div class="container-fluid js-main-title">
+      <br />
+      <div class="row">
+        <div class="col">
+          <h1>Worked Hours Tracker</h1>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary js-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- js-main -->
+    <div class="container-fluid collapse js-part js-main">
+      
+      <div class="row">
+        <div class="col-auto">
+          <button type="button" class="btn btn-primary js-users-btn js-admin-fn">Users</button>
+          <button type="button" class="btn btn-primary js-contacts-btn">Contacts</button>
+          <button type="button" class="btn btn-primary js-costs-btn js-admin-fn">Costs</button>
+          <button type="button" class="btn btn-primary js-report-btn">Report</button>
+        </div>
+      </div>
+
+      <!------------------------------------------------------------------------------------->
+      <!-- USERS -->
+      <!------------------------------------------------------------------------------------->
+      <div class="row js-main-users js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Users</h2>
+
+          <div class="row">
+            <div class="col-auto">
+              <button type="button" class="btn btn-success js-user-new-btn">Create</button>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col">
+              <div id="users-tbl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row js-main-user-edit js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>User edit</h2>
+
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-success js-user-save-btn">
+                <i class="fas fa-save"></i> Save changes</button>
+              <button type="button" class="btn btn-danger js-user-delete-btn">
+                <i class="fas fa-trash"></i> Remove</button>
+              <button type="button" class="btn btn-light js-user-discard-btn">
+                <i class="fas fa-times"></i> Close</button>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="user-edit-username-box">
+                <b>Username</b>
+            </div>
+            <div class="col">
+              <input type="hidden" id="user-guid" />
+              <input type="text" class="form-control" id="user-edit-username-box" />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="row mt-2">
+            <div class="col-2 text-right">
+              <label for="user-edit-password-box">
+                <b>Password</b>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" id="user-edit-password-box" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!------------------------------------------------------------------------------------->
+      <!-- CONTACTS -->
+      <!------------------------------------------------------------------------------------->
+      <div class="row js-main-contacts js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Contacts</h2>
+        </div>
+      </div>
+
+      <!------------------------------------------------------------------------------------->
+      <!-- COSTS -->
+      <!------------------------------------------------------------------------------------->
+      <div class="row js-main-costs js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Costs</h2>
+        </div>
+      </div>
+
+      <!------------------------------------------------------------------------------------->
+      <!-- REPORT -->
+      <!------------------------------------------------------------------------------------->
+      <div class="row js-main-report js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Report</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- js-cred -->
+    <div class="container-fluid js-part js-cred-edit collapse">
+      <hr />
+      <h3>Credentials editor</h3>
+
+      <!-- credentials tools -->
+      <div class="row">
+        <div class="col-4"></div>
+        <div class="col">
+          <button type="button" class="btn btn-success js-cred-save-btn">
+            <i class="fas fa-save"></i> Save changes</button>
+          <button type="button" class="btn btn-danger js-cred-delete-btn">
+            <i class="fas fa-trash"></i> Remove</button>
+          <button type="button" class="btn btn-light js-cred-discardbtn">
+            <i class="fas fa-times"></i> Close</button>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-name-box">
+            <b>Service</b>
+        </div>
+        <div class="col">
+          <input type="hidden" id="cred-guid" />
+          <input type="text" class="form-control" id="cred-name-box" />
+        </div>
+      </div>
+
+      <!-- URL -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <b>URL</b>
+          <i class="fas fa-globe ml-3"></i>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" id="cred-link-box" />
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-username-box">
+            <b>Username</b>
+            <i class="fas fa-user ml-3"></i>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" id="cred-username-box" />
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-email-box">
+            <b>Email</b>
+            <i class="fas fa-envelope ml-3"></i>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" id="cred-email-box" />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label>
+            <b>Password</b>
+            <i class="fas fa-key ml-3"></i>
+        </div>
+        <div class="col">
+          <div class="row">
+            <div class="col">
+              <input type="text" id="cred-pass-box" style="width:100%" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary mt-1 js-pwd-clip" data-clipboard-target="#cred-pass-box">
+                <i class="fas fa-clipboard"></i> Copy to clipboard</button>
+              <button type="button" class="btn btn-primary mt-1" id='pwd-regen-btn'>
+                <i class="fas fa-recycle"></i> Regenerate</button>
+              Length:
+              <input type="text" id="cred-password-regen-length-box" style="width:50px" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pin -->
+      <div class="row mt-2 js-pin-div collapse">
+        <div class="col-4 text-right">
+          <label>
+            <b>Pin</b>
+            <i class="fas fa-barcode ml-3"></i>
+        </div>
+        <div class="col">
+          <div class="row">
+            <div class="col">
+              <input type="text" id="cred-pin-box" style="width:100%" minlength="4" maxlength="4" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-notes-box">
+            <b>Notes</b>
+            <i class="fas fa-file-alt ml-3"></i>
+          </label>
+        </div>
+        <div class="col">
+          <textarea style="width:100%; height:200px" id='cred-notes-box'></textarea>
+        </div>
+      </div>
+
+      <!-- Create timestamp -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-notes-box">
+            <b>Created</b>
+          </label>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" readonly id="cred-create-timestamp" />
+        </div>
+      </div>
+
+      <!-- Create timestamp -->
+      <div class="row mt-2">
+        <div class="col-4 text-right">
+          <label for="cred-notes-box">
+            <b>Modified</b>
+          </label>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" readonly id="cred-modify-timestamp" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- js-login -->
+    <div class="container-fluid collapse js-part js-login">
+      <div class="row">
+        <div class="col">
+          <h2>Login</h2>
+          <form id='login-form'>
+            <div class="form-group">
+              <label for="login-password-box">Username</label>
+              <input type="text" class="form-control" id='login-username-box' name="username" placeholder="Username" />
+            </div>
+            <div class="form-group">
+              <label for="login-password-box">Password</label>
+              <input type="password" class="form-control" id="login-password-box" name="password" placeholder="Password" />
+            </div>
+            <button type="submit" class="btn btn-primary" id='login-btn'>Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+    crossorigin="anonymous"></script>
+  <script src="bower_components/bootstrap4/dist/js/bootstrap.min.js"></script>
+
+  <!-- https://notifyjs.jpillora.com/ -->
+  <!--<script src="bower_components/notifyjs/dist/styles/metro/notify-metro.js"></script>-->
+  <script src="bower_components/notifyjs/dist/notify.js"></script>
+
+  <!-- https://github.com/pammacdotnet/Json-to-HTML-Table -->
+  <script src="bower_components/json-to-table/json-to-table.js"></script>
+
+  <!-- underscore -->
+  <script src="bower_components/underscore/underscore-min.js"></script>
+
+  <!-- https://github.com/zenorocha/clipboard.js -->
+  <script src="bower_components/clipboard/dist/clipboard.js"></script>
+
+  <!-- https://leaverou.github.io/awesomplete/ -->
+  <script src="bower_components/awesomplete/awesomplete.min.js"></script>
+
+  <!-- http://momentjs.com -->
+  <script src="bower_components/moment/min/moment-with-locales.min.js"></script>
+
+  <!-- https://github.com/devel0/js-util -->
+  <script src="js-util.js"></script>
+
+  <!-- utils -->
+  <script src="utils.js"></script>
+
+  <!-- app -->
+  <script src="app.js"></script>
+</body>
+
+</html>

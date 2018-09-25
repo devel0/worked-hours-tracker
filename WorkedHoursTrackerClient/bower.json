@@ -1,0 +1,31 @@
+{
+  "name": "WorkedHoursTrackerClient",
+  "homepage": "https://github.com/devel0/worked-hours-tracker",
+  "authors": [
+    "Lorenzo Delana <oss.devel@searchathing.com>"
+  ],
+  "description": "web tracker of worked hours",
+  "main": "app.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jquery": "^3.3.1",
+    "bootstrap4": "^4.1.0",
+    "awesomplete": "^1.1.2",
+    "moment": "^2.22.2"
+  },
+  "dependencies": {
+    "notifyjs": "^0.4.2",
+    "json-to-table": "*",
+    "Font-Awesome": "^5.0.13",
+    "underscore": "^1.9.1",
+    "clipboard": "^2.0.1"
+  }
+}

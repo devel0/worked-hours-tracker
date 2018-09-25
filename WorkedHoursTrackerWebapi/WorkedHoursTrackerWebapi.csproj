@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />    
+    <PackageReference Include="netcore-util" Version="1.0.0-CI00049" /> 
   </ItemGroup>
 
 </Project>
