@@ -11,4 +11,7 @@ web tracker of worked hours
 
 ```sh
 dotnet new webapi --name=WorkedHoursTrackerWebapi
+mkdir WorkedHoursTrackerClient
+cd WorkedHoursTrackerClient
+bower init
 ```
