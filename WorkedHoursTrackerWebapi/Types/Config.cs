@@ -18,19 +18,22 @@ namespace WorkedHoursTrackerWebapi
         public Config()
         {
             if (Credentials == null) Credentials = new List<CredInfo>();
+            if (Contacts == null) Contacts = new List<ContactInfo>();
         }
+
+        #region USERS
 
         public void SaveCred(CredInfo cred)
         {
             lock (lck)
             {
                 if (string.IsNullOrEmpty(cred.GUID))
-                {                    
+                {
                     if (cred.Username == "admin") throw new Exception($"cannot create builtin admin account");
                     cred.GUID = Guid.NewGuid().ToString();
 
                     // trim spaces                    
-                    cred.Password = cred.Password?.Trim();                    
+                    cred.Password = cred.Password?.Trim();
 
                     cred.CreateTimestamp = DateTime.UtcNow;
 
@@ -41,9 +44,9 @@ namespace WorkedHoursTrackerWebapi
                     var q = Credentials.FirstOrDefault(w => w.GUID == cred.GUID);
                     if (q == null) throw new Exception($"unable to find [{cred.GUID}] entry");
 
-                    q.Password = cred.Password?.Trim();                    
+                    q.Password = cred.Password?.Trim();
                     q.ModifyTimestamp = DateTime.UtcNow;
-                }                
+                }
             }
             Save();
         }
@@ -86,6 +89,77 @@ namespace WorkedHoursTrackerWebapi
             return res;
         }
 
+        #endregion
+
+        #region CONTACTS
+
+        public void SaveContact(ContactInfo contact)
+        {
+            lock (lck)
+            {
+                if (string.IsNullOrEmpty(contact.GUID))
+                {
+                    contact.GUID = Guid.NewGuid().ToString();
+
+                    // trim spaces                    
+                    contact.Name = contact.Name.Trim();
+
+                    contact.CreateTimestamp = DateTime.UtcNow;
+
+                    Contacts.Add(contact);
+                }
+                else
+                {
+                    var q = Contacts.FirstOrDefault(w => w.GUID == contact.GUID);
+                    if (q == null) throw new Exception($"unable to find [{contact.GUID}] entry");
+
+                    q.Name = contact.Name.Trim();
+                }
+            }
+            Save();
+        }
+
+        public ContactInfo LoadContact(string guid)
+        {
+            ContactInfo nfo;
+            lock (lck)
+            {
+                nfo = Contacts.FirstOrDefault(w => w.GUID == guid);
+            }
+
+            return nfo;
+        }
+
+        public void DeleteContact(string guid)
+        {
+            ContactInfo nfo;
+            lock (lck)
+            {
+                nfo = Contacts.FirstOrDefault(w => w.GUID == guid);
+
+                // TODO : check references
+
+                if (nfo != null) Contacts.Remove(nfo);
+            }
+        }
+
+        public List<ContactInfo> GetContactList(string filter)
+        {
+            List<ContactInfo> res;
+
+            if (!string.IsNullOrEmpty(filter)) filter = filter.Trim();
+
+            lock (lck)
+            {
+                res = Contacts.Where(r => new[] { r.Name }.MatchesFilter(filter))
+                .ToList();
+            }
+
+            return res;
+        }
+
+        #endregion
+
         public void Save()
         {
             lock (lck)
@@ -108,6 +182,7 @@ namespace WorkedHoursTrackerWebapi
         public string AdminPassword { get; set; }
 
         public List<CredInfo> Credentials { get; set; }
+        public List<ContactInfo> Contacts { get; set; }
 
     }
 

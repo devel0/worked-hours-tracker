@@ -60,6 +60,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
         #endregion
 
+        #region USERS
+
         [HttpPost]
         public CommonResponse SaveCred(string username, string password, CredInfo cred)
         {
@@ -124,7 +126,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 // disallow non admin
                 if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var response = new CredListResponse();
+                var response = new CredInfoListResponse();
 
                 response.CredList = config.GetCredList(filter);
 
@@ -135,6 +137,84 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 return ErrorResponse(ex.Message);
             }
         }
+
+        #endregion
+
+        #region CONTACTS
+
+        [HttpPost]
+        public CommonResponse SaveContact(string username, string password, ContactInfo contact)
+        {
+            try
+            {                
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                config.SaveContact(contact);
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse LoadContact(string username, string password, string guid)
+        {
+            try
+            {                
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                var response = new ContactInfoResponse();
+
+                response.Contact = config.LoadContact(guid);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse DeleteContact(string username, string password, string guid)
+        {
+            try
+            {                
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                config.DeleteContact(guid);
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse ContactList(string username, string password, string filter)
+        {
+            try
+            {                
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                var response = new ContactInfoListResponse();
+
+                response.ContactList = config.GetContactList(filter);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        #endregion
 
         [HttpPost]
         public CommonResponse IsAuthValid(string username, string password)
