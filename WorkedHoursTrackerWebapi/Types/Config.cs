@@ -21,7 +21,7 @@ namespace WorkedHoursTrackerWebapi
             if (Contacts == null) Contacts = new List<ContactInfo>();
         }
 
-        #region USERS
+        #region USERS / COST
 
         public void SaveCred(CredInfo cred)
         {
@@ -45,7 +45,8 @@ namespace WorkedHoursTrackerWebapi
                     if (q == null) throw new Exception($"unable to find [{cred.GUID}] entry");
 
                     q.Password = cred.Password?.Trim();
-                    q.ModifyTimestamp = DateTime.UtcNow;
+                    q.Cost = cred.Cost;
+                    q.ModifyTimestamp = DateTime.UtcNow;                    
                 }
             }
             Save();
@@ -102,7 +103,7 @@ namespace WorkedHoursTrackerWebapi
                     contact.GUID = Guid.NewGuid().ToString();
 
                     // trim spaces                    
-                    contact.Name = contact.Name.Trim();
+                    contact.Name = contact.Name.Trim();                    
 
                     contact.CreateTimestamp = DateTime.UtcNow;
 
@@ -113,7 +114,7 @@ namespace WorkedHoursTrackerWebapi
                     var q = Contacts.FirstOrDefault(w => w.GUID == contact.GUID);
                     if (q == null) throw new Exception($"unable to find [{contact.GUID}] entry");
 
-                    q.Name = contact.Name.Trim();
+                    q.Name = contact.Name.Trim();                    
                 }
             }
             Save();

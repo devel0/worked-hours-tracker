@@ -67,8 +67,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                // allow user change their own pass or admin to change others
-                if (cred == null || (username != cred.Username && username != "admin") || !CheckAuth(username, password)) return InvalidAuthResponse();
+                // disallow non admin
+                if (cred == null || username  != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 config.SaveCred(cred);
 

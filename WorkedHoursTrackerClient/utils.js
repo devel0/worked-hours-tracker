@@ -41,13 +41,7 @@ function gotoState(newstate) {
             {
                 showInnerPart('.js-main', '.js-main-contact-edit');
             }
-            break;
-
-        case 'costs':
-            {
-                showInnerPart('.js-main', '.js-main-costs');
-            }
-            break;
+            break;        
 
         case 'report':
             {

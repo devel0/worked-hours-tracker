@@ -66,11 +66,13 @@ function reloadUsers() {
                 let html = '<table class="table table-striped">';
                 html += '<thead><tr>';
                 html += '<th scope="col">Username</th>';
+                html += '<th scope="col">Cost</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
                 _.each(_.sortBy(data.credList, (x) => x.username), (x) => {
                     html += '<tr>';
                     html += '<td><a href="#edit" onclick="openUser(\'' + x.guid + '\');">' + x.username + '</a></td>';
+                    html += '<td><a href="#edit" onclick="openUser(\'' + x.guid + '\');">' + x.cost + '</a></td>';
                     html += '</tr>';
                 });
                 html += '</tbody>';
@@ -86,12 +88,14 @@ function reloadUsers() {
 function clearUserEdit() {
     $('#user-edit-username-box')[0].value = '';
     $('#user-edit-password-box')[0].value = '';
+    $('#user-edit-cost-box')[0].value = '0';
 }
 
 function buildUserEditObj() {
     return {
         username: $('#user-edit-username-box')[0].value,
         password: $('#user-edit-password-box')[0].value,
+        cost: $('#user-edit-cost-box')[0].value,
         guid: $('#user-guid')[0].value
     };
 }
@@ -123,6 +127,7 @@ function openUser(guid) {
             if (checkApiSuccessful(data)) {
                 $('#user-edit-username-box')[0].value = data.cred.username;
                 $('#user-edit-password-box')[0].value = data.cred.password;
+                $('#user-edit-cost-box')[0].value = data.cred.cost;
                 $('#user-guid')[0].value = data.cred.guid;
 
                 userEditOrig = JSON.stringify(buildUserEditObj());
@@ -222,12 +227,12 @@ function reloadContacts() {
             if (checkApiSuccessful(data)) {
                 let html = '<table class="table table-striped">';
                 html += '<thead><tr>';
-                html += '<th scope="col">Name</th>';
+                html += '<th scope="col">Name</th>';                
                 html += '</tr></thead>';
                 html += '<tbody>';
                 _.each(_.sortBy(data.contactList, (x) => x.username), (x) => {
                     html += '<tr>';
-                    html += '<td><a href="#edit" onclick="openContact(\'' + x.guid + '\');">' + x.name + '</a></td>';
+                    html += '<td><a href="#edit" onclick="openContact(\'' + x.guid + '\');">' + x.name + '</a></td>';                    
                     html += '</tr>';
                 });
                 html += '</tbody>';
@@ -246,7 +251,7 @@ function clearContactEdit() {
 
 function buildContactEditObj() {
     return {
-        name: $('#contact-edit-name-box')[0].value,
+        name: $('#contact-edit-name-box')[0].value,        
         guid: $('#user-guid')[0].value
     };
 }

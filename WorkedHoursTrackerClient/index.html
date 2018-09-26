@@ -34,25 +34,23 @@
           <h1>Worked Hours Tracker</h1>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-primary js-logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Logout</button>
+          <button type="button" class="btn btn-primary js-logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
       </div>
     </div>
 
     <!-- js-main -->
     <div class="container-fluid collapse js-part js-main">
-      
+
       <div class="row">
         <div class="col-auto">
           <button type="button" class="btn btn-primary js-users-btn js-admin-fn">
-              <i class="fas fa-users"></i> Users</button>
+            <i class="fas fa-users"></i> Users</button>
           <button type="button" class="btn btn-primary js-contacts-btn ml-1">
-              <i class="fas fa-address-card"></i> Contacts</button>
-          <button type="button" class="btn btn-primary js-costs-btn js-admin-fn ml-1">
-              <i class="fas fa-euro-sign"></i> Costs</button>
+            <i class="fas fa-address-card"></i> Contacts</button>          
           <button type="button" class="btn btn-primary js-report-btn ml-1">
-              <i class="fas fa-file-excel"></i> Report</button>
+            <i class="fas fa-file-excel"></i> Report</button>
         </div>
       </div>
 
@@ -117,6 +115,17 @@
             </div>
           </div>
 
+          <!-- Cost -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="user-edit-cost-box">
+                <b>Cost</b>
+            </div>
+            <div class="col">              
+              <input type="text" class="form-control" id="user-edit-cost-box" />
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -124,62 +133,52 @@
       <!-- CONTACTS -->
       <!------------------------------------------------------------------------------------->
       <div class="row js-main-contacts js-inner-part collapse">
-          <div class="col">
-            <br />
-            <h2>Contacts</h2>
-  
-            <div class="row">
-              <div class="col-auto">
-                <button type="button" class="btn btn-success js-contact-new-btn">Create</button>
-              </div>
-            </div>
-  
-            <div class="row mt-3">
-              <div class="col">
-                <div id="contacts-tbl"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="row js-main-contact-edit js-inner-part collapse">
-          <div class="col">
-            <br />
-            <h2>Contact edit</h2>
-  
-            <div class="row">
-              <div class="col">
-                <button type="button" class="btn btn-success js-contact-save-btn">
-                  <i class="fas fa-save"></i> Save changes</button>
-                <button type="button" class="btn btn-danger js-contact-delete-btn">
-                  <i class="fas fa-trash"></i> Remove</button>
-                <button type="button" class="btn btn-light js-contact-discard-btn">
-                  <i class="fas fa-times"></i> Close</button>
-              </div>
-            </div>  
-  
-            <!-- Name -->
-            <div class="row mt-3">
-              <div class="col-2 text-right">
-                <label for="contact-edit-name-box">
-                  <b>Name</b>
-              </div>
-              <div class="col">
-                <input type="hidden" id="contact-guid" />
-                <input type="text" class="form-control" id="contact-edit-name-box" />
-              </div>
-            </div>  
-  
-          </div>
-        </div>
-
-      <!------------------------------------------------------------------------------------->
-      <!-- COSTS -->
-      <!------------------------------------------------------------------------------------->
-      <div class="row js-main-costs js-inner-part collapse">
         <div class="col">
           <br />
-          <h2>Costs</h2>
+          <h2>Contacts</h2>
+
+          <div class="row">
+            <div class="col-auto">
+              <button type="button" class="btn btn-success js-contact-new-btn">Create</button>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col">
+              <div id="contacts-tbl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row js-main-contact-edit js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Contact edit</h2>
+
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-success js-contact-save-btn">
+                <i class="fas fa-save"></i> Save changes</button>
+              <button type="button" class="btn btn-danger js-contact-delete-btn">
+                <i class="fas fa-trash"></i> Remove</button>
+              <button type="button" class="btn btn-light js-contact-discard-btn">
+                <i class="fas fa-times"></i> Close</button>
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="contact-edit-name-box">
+                <b>Name</b>
+            </div>
+            <div class="col">
+              <input type="hidden" id="contact-guid" />
+              <input type="text" class="form-control" id="contact-edit-name-box" />
+            </div>
+          </div>
+
         </div>
       </div>
 
