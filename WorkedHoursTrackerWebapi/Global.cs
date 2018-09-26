@@ -70,18 +70,18 @@ namespace WorkedHoursTrackerWebapi
 
                 var attrs = File.GetAttributes(AppConfigPathfilename);
                 Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(AppConfigPathfilename));
-
-                // ensure admin account
-                if (!Config.Credentials.Any(w => w.Username == "admin"))
+            }
+            
+            // ensure admin account
+            if (!Config.Credentials.Any(w => w.Username == "admin"))
+            {
+                Config.Credentials.Add(new CredInfo()
                 {
-                    Config.Credentials.Add(new CredInfo()
-                    {
-                        Username = "admin",
-                        Password = "admin",
-                        CreateTimestamp = DateTime.UtcNow,
-                        GUID = Guid.NewGuid().ToString("N")
-                    });
-                }
+                    Username = "admin",
+                    Password = "admin",
+                    CreateTimestamp = DateTime.UtcNow,
+                    GUID = Guid.NewGuid().ToString("N")
+                });
             }
         }
 
