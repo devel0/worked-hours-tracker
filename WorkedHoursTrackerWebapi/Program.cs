@@ -20,7 +20,7 @@ namespace WorkedHoursTrackerWebapi
         {
             MainStarted = true;
 
-            var g = Global.Instance;            
+            //var g = Global.Instance;
 
             BuildWebHost(args).Run();
         }
@@ -29,6 +29,12 @@ namespace WorkedHoursTrackerWebapi
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseUrls("http://0.0.0.0:5000")
+             /*   .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })*/
                 .Build();
     }
 }

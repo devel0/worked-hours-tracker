@@ -4,20 +4,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SearchAThing.Util;
 
 namespace WorkedHoursTrackerWebapi.Controllers
 {
+
     [Route("[controller]/[action]")]
     public class ApiController : Controller
     {
 
-        Global global { get { return Global.Instance; } }
-        Config config { get { return global.Config; } }
+        private readonly IGlobal global;
+
+        private readonly ILogger logger;
+        private readonly MyDbContext ctx;
 
         #region constructor
-        public ApiController()
+        public ApiController(MyDbContext ctx, ILogger<ApiController> logger)
         {
+            this.logger = logger;
+            this.ctx = ctx;
+            logger.LogDebug($"ApiController created");
+            EnsureAdminAccount();
+        }
+
+        void EnsureAdminAccount()
+        {
+            if (!ctx.Users.Any(w => w.Username == "admin"))
+            {
+                ctx.Users.Add(new User()
+                {
+                    Username = "admin",
+                    Password = "admin",
+                    CreateTimestamp = DateTime.Now
+                });
+                ctx.SaveChanges();
+            }
         }
         #endregion
 
@@ -43,16 +65,17 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
         bool CheckAuth(string username, string password)
         {
-            var inCredentials = config.Credentials.FirstOrDefault(w => w.Username == username);
+            var qdb = ctx.Users.FirstOrDefault(w => w.Username == username);
 
-            var is_valid = inCredentials != null && inCredentials.Password == password;
+            var is_valid = qdb != null && qdb.Password == password;
 
             if (!is_valid)
             {
                 var q = HttpContext.Request.Headers["X-Real-IP"];
                 var url = "";
                 if (q.Count > 0) url = q.First();
-                global.LogWarning($"invalid login attempt from [{url}]");
+
+                logger.LogWarning($"invalid login attempt from [{url}]");
                 // todo : autoban
             }
 
@@ -63,14 +86,38 @@ namespace WorkedHoursTrackerWebapi.Controllers
         #region USERS
 
         [HttpPost]
-        public CommonResponse SaveCred(string username, string password, CredInfo cred)
+        public CommonResponse SaveUser(string username, string password, User jUser)
         {
             try
             {
                 // disallow non admin
-                if (cred == null || username  != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                if (jUser == null || username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                config.SaveCred(cred);
+                User user = null;
+
+                if (jUser.id == 0)
+                {
+                    if (jUser.Username == "admin") throw new Exception($"cannot create builtin admin account");
+
+                    user = new User()
+                    {
+                        Username = jUser.Username,
+                        CreateTimestamp = DateTime.UtcNow
+                    };
+
+                    ctx.Users.Add(user);
+                }
+                else
+                {
+                    user = ctx.Users.FirstOrDefault(w => w.id == jUser.id);
+                    if (user == null) throw new Exception($"unable to find [{jUser.id}] entry");
+
+                    user.ModifyTimestamp = DateTime.UtcNow;
+                }
+                user.Password = jUser.Password?.Trim();
+                user.Cost = jUser.Cost;
+
+                ctx.SaveChanges();
 
                 return SuccessfulResponse();
             }
@@ -81,16 +128,16 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadCred(string username, string password, string guid)
+        public CommonResponse LoadUser(string username, string password, int id)
         {
             try
             {
                 // disallow non admin
                 if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var response = new CredInfoResponse();
+                var response = new UserResponse();
 
-                response.Cred = config.LoadCred(guid);
+                response.User = ctx.Users.FirstOrDefault(w => w.id == id);
 
                 return response;
             }
@@ -101,14 +148,19 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteCred(string username, string password, string guid)
+        public CommonResponse DeleteUser(string username, string password, int id)
         {
             try
             {
                 // disallow non admin
                 if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                config.DeleteCred(guid);
+                var q = ctx.Users.FirstOrDefault(w => w.id == id);
+                if (q != null)
+                {
+                    ctx.Users.Remove(q);
+                    ctx.SaveChanges();
+                }
 
                 return SuccessfulResponse();
             }
@@ -119,16 +171,16 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse CredList(string username, string password, string filter)
+        public CommonResponse UserList(string username, string password, string filter)
         {
             try
             {
                 // disallow non admin
                 if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var response = new CredInfoListResponse();
+                var response = new UserListResponse();
 
-                response.CredList = config.GetCredList(filter);
+                response.UserList = ctx.Users.ToList().Where(r => new[] { r.Username }.MatchesFilter(filter)).ToList();
 
                 return response;
             }
@@ -143,13 +195,29 @@ namespace WorkedHoursTrackerWebapi.Controllers
         #region CONTACTS
 
         [HttpPost]
-        public CommonResponse SaveContact(string username, string password, ContactInfo contact)
+        public CommonResponse SaveCustomer(string username, string password, Customer jCustomer)
         {
             try
-            {                
+            {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                config.SaveContact(contact);
+                Customer customer = null;
+                if (jCustomer.id == 0)
+                {
+                    customer = new Customer()
+                    {
+                        CreateTimestamp = DateTime.UtcNow
+                    };
+                    
+                    ctx.Customers.Add(customer);
+                }
+                else
+                {
+                    customer = ctx.Customers.FirstOrDefault(w => w.id == jCustomer.id);
+                    if (customer == null) throw new Exception($"unable to find [{jCustomer.id}] entry");
+                }
+                customer.Name = jCustomer.Name.Trim();
+                ctx.SaveChanges();
 
                 return SuccessfulResponse();
             }
@@ -160,15 +228,15 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadContact(string username, string password, string guid)
+        public CommonResponse LoadCustomer(string username, string password, int id)
         {
             try
-            {                
+            {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new ContactInfoResponse();
 
-                response.Contact = config.LoadContact(guid);
+                response.Customer = ctx.Customers.FirstOrDefault(w => w.id == id);
 
                 return response;
             }
@@ -179,13 +247,19 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteContact(string username, string password, string guid)
+        public CommonResponse DeleteCustomer(string username, string password, int id)
         {
             try
-            {                
+            {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                config.DeleteContact(guid);
+                var q = ctx.Customers.FirstOrDefault(w => w.id == id);
+
+                if (q != null)
+                {
+                    ctx.Customers.Remove(q);
+                    ctx.SaveChanges();
+                }
 
                 return SuccessfulResponse();
             }
@@ -196,15 +270,15 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse ContactList(string username, string password, string filter)
+        public CommonResponse CustomerList(string username, string password, string filter)
         {
             try
-            {                
+            {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var response = new ContactInfoListResponse();
+                var response = new CustomerListResponse();
 
-                response.ContactList = config.GetContactList(filter);
+                response.customerList = ctx.Customers.ToList().Where(r => new[] { r.Name }.MatchesFilter(filter)).ToList();
 
                 return response;
             }
@@ -231,4 +305,5 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
     }
+
 }

@@ -10,8 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.3" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />    
-    <PackageReference Include="netcore-util" Version="1.0.0-CI00049" /> 
+    <PackageReference Include="netcore-util" Version="1.0.0-CI00049" />    
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" /> 
   </ItemGroup>
 
 </Project>

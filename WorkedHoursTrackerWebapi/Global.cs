@@ -1,33 +1,15 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static System.Environment;
 
 namespace WorkedHoursTrackerWebapi
 {
 
-    public class Global
-    {
-
-        #region singleton instance
-        static object _InstanceLck = new object();
-        static Global _Instance;
-        public static Global Instance
-        {
-            get
-            {
-                if (_Instance != null) return _Instance;
-
-                lock (_InstanceLck)
-                {
-                    if (_Instance == null) _Instance = new Global();
-                }
-
-                return _Instance;
-            }
-        }
-        #endregion
+    public class Global : IGlobal
+    {        
 
         public static string AppFolder
         {
@@ -53,12 +35,18 @@ namespace WorkedHoursTrackerWebapi
 
         public Config Config { get; private set; }
 
-        void InitConfig()
+        public string ConnectionString => Config.ConnectionString;
+
+        private readonly ILogger logger;
+
+        public Global(ILogger<Global> logger)
         {
-            if (!File.Exists(AppConfigPathfilename))
+            this.logger = logger;
+
+            if (!File.Exists(Global.AppConfigPathfilename))
             {
                 Config = new Config();
-                Config.Save();
+                Config.Save(logger);
             }
             else
             {
@@ -71,50 +59,18 @@ namespace WorkedHoursTrackerWebapi
                 var attrs = File.GetAttributes(AppConfigPathfilename);
                 Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(AppConfigPathfilename));
             }
-            
-            // ensure admin account
-            if (!Config.Credentials.Any(w => w.Username == "admin"))
+
+            if (string.IsNullOrEmpty(Config.DBHostname) || Config.DBPassword == "pass")
             {
-                Config.Credentials.Add(new CredInfo()
-                {
-                    Username = "admin",
-                    Password = "admin",
-                    CreateTimestamp = DateTime.UtcNow,
-                    GUID = Guid.NewGuid().ToString("N")
-                });
+                Config.DBHostname = "hostname";
+                Config.DBPort = 5432;
+                Config.DBName = "worked_hours_tracker";
+                Config.DBUsername = "postgres";
+                Config.DBPassword = "pass";
+                Config.Save(logger);
+
+                throw new Exception($"please configure [{AppConfigPathfilename}] setting DBHostname, DBPort, DBName, DBUsername, DBPassword (see README.md)");
             }
-        }
-
-        public Global()
-        {
-            InitConfig();
-        }
-
-        void Log(ConsoleColor color, string prefix, string msg)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine($"{DateTime.Now} ({prefix}) : {msg}");
-            Console.ResetColor();
-        }
-
-        internal void LogDebug(string msg)
-        {
-            Log(ConsoleColor.DarkGray, "dbg", msg);
-        }
-
-        internal void LogInfo(string msg)
-        {
-            Log(ConsoleColor.Blue, "nfo", msg);
-        }
-
-        internal void LogWarning(string msg)
-        {
-            Log(ConsoleColor.Yellow, "wrn", msg);
-        }
-
-        internal void LogError(string msg)
-        {
-            Log(ConsoleColor.Red, "err", msg);
         }
 
     }

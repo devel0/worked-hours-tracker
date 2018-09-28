@@ -1,26 +1,30 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkedHoursTrackerWebapi
 {
 
-    public class CredInfo
+    [Table("user")]
+    public class User
     {
-        
-        public string Username { get; set; }        
 
-        public string Password { get; set; }         
+        [Key]
+        public int id { get; set; }
 
-        public double Cost { get; set; }                       
+        [Required]
+        public string Username { get; set; }
 
-        /// <summary>
-        /// null for new entries
-        /// </summary>        
-        public string GUID { get; set; }
+        [Required]
+        public string Password { get; set; }
 
+        public double Cost { get; set; }
+
+        [Required]
         /// <summary>
         /// create timestamp ( UTC )
         /// </summary>    
-        public DateTime? CreateTimestamp { get; set; }
+        public DateTime CreateTimestamp { get; set; }
 
         /// <summary>
         /// modify timestamp ( UTC )

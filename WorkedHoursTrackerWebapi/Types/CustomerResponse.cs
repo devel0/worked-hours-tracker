@@ -6,7 +6,7 @@ namespace WorkedHoursTrackerWebapi
     public class ContactInfoResponse : CommonResponse
     {
 
-        public ContactInfo Contact { get; set; }
+        public Customer Customer { get; set; }
 
     }
 

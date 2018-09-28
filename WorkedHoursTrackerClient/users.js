@@ -8,7 +8,7 @@ $('.js-users-btn').click(function (e) {
 
 // load user list
 function reloadUsers() {
-    $.post(urlbase + '/Api/CredList',
+    $.post(urlbase + '/Api/UserList',
         {
             username: username,
             password: password
@@ -22,10 +22,10 @@ function reloadUsers() {
                 html += '<th scope="col">Cost</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
-                _.each(_.sortBy(data.credList, (x) => x.username), (x) => {
+                _.each(_.sortBy(data.userList, (x) => x.username), (x) => {
                     html += '<tr>';
-                    html += '<td><a href="#edit" onclick="openUser(\'' + x.guid + '\');">' + x.username + '</a></td>';
-                    html += '<td><a href="#edit" onclick="openUser(\'' + x.guid + '\');">' + x.cost + '</a></td>';
+                    html += '<td><a href="#edit" onclick="openUser(\'' + x.id + '\');">' + x.username + '</a></td>';
+                    html += '<td><a href="#edit" onclick="openUser(\'' + x.id + '\');">' + x.cost + '</a></td>';
                     html += '</tr>';
                 });
                 html += '</tbody>';
@@ -39,9 +39,10 @@ function reloadUsers() {
 }
 
 function clearUserEdit() {
+    $('#user-edit-id')[0].value = '0';
     $('#user-edit-username-box')[0].value = '';
     $('#user-edit-password-box')[0].value = '';
-    $('#user-edit-cost-box')[0].value = '0';
+    $('#user-edit-cost-box')[0].value = '0';    
 }
 
 function buildUserEditObj() {
@@ -49,7 +50,7 @@ function buildUserEditObj() {
         username: $('#user-edit-username-box')[0].value,
         password: $('#user-edit-password-box')[0].value,
         cost: $('#user-edit-cost-box')[0].value,
-        guid: $('#user-guid')[0].value
+        id: $('#user-edit-id')[0].value
     };
 }
 
@@ -68,20 +69,20 @@ $('.js-user-new-btn').click(function (e) {
 })
 
 // edit user
-function openUser(guid) {
-    $.post(urlbase + '/Api/LoadCred',
+function openUser(id) {
+    $.post(urlbase + '/Api/LoadUser',
         {
             username: username,
             password: password,
-            guid: guid
+            id: id
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
-                $('#user-edit-username-box')[0].value = data.cred.username;
-                $('#user-edit-password-box')[0].value = data.cred.password;
-                $('#user-edit-cost-box')[0].value = data.cred.cost;
-                $('#user-guid')[0].value = data.cred.guid;
+                $('#user-edit-username-box')[0].value = data.user.username;
+                $('#user-edit-password-box')[0].value = data.user.password;
+                $('#user-edit-cost-box')[0].value = data.user.cost;
+                $('#user-edit-id')[0].value = data.user.id;
 
                 userEditOrig = JSON.stringify(buildUserEditObj());
 
@@ -101,11 +102,11 @@ $('.js-user-save-btn').click(function (e) {
     }
 
     $.post(
-        urlbase + '/Api/SaveCred',
+        urlbase + '/Api/SaveUser',
         {
             username: username,
             password: password,
-            cred: buildUserEditObj()
+            jUser: buildUserEditObj()
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
@@ -124,11 +125,11 @@ $('.js-user-save-btn').click(function (e) {
 $('.js-user-delete-btn').click(function (e) {
     if (confirm('sure to delete ?')) {
         $.post(
-            urlbase + '/Api/DeleteCred',
+            urlbase + '/Api/DeleteUser',
             {
                 username: username,
                 password: password,
-                guid: $('#user-guid')[0].value
+                id: $('#user-edit-id')[0].value
             },
             function (data, status, jqXHR) {
                 if (checkApiError(data)) return;

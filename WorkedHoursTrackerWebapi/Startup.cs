@@ -19,6 +19,7 @@ namespace WorkedHoursTrackerWebapi
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -26,13 +27,19 @@ namespace WorkedHoursTrackerWebapi
 
         public IConfiguration Configuration { get; }
 
-        Global global { get { return Global.Instance; } }
+        //Global global { get { return Global.Instance; } }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            var config = global.Config;
+        {            
+            services.AddSingleton<IGlobal, Global>();
 
+            services.AddDbContext<MyDbContext>((o) =>
+            {
+                //MyDbContextFactory factory = new MyDbContextFactory();                
+                var global = (IGlobal)services.BuildServiceProvider().GetRequiredService(typeof(IGlobal));
+                o.UseNpgsql(global.ConnectionString);
+            });
             services.AddMvc();
             services.AddCors();
         }

@@ -99,7 +99,7 @@
                 <b>Username</b>
             </div>
             <div class="col">
-              <input type="hidden" id="user-guid" />
+              <input type="hidden" id="user-edit-id" />
               <input type="text" class="form-control" id="user-edit-username-box" />
             </div>
           </div>
@@ -130,39 +130,39 @@
       </div>
 
       <!------------------------------------------------------------------------------------->
-      <!-- CONTACTS -->
+      <!-- CUSTOMERS -->
       <!------------------------------------------------------------------------------------->
-      <div class="row js-main-contacts js-inner-part collapse">
+      <div class="row js-main-customers js-inner-part collapse">
         <div class="col">
           <br />
-          <h2>Contacts</h2>
+          <h2>Customers</h2>
 
           <div class="row">
             <div class="col-auto">
-              <button type="button" class="btn btn-success js-contact-new-btn">Create</button>
+              <button type="button" class="btn btn-success js-customer-new-btn">Create</button>
             </div>
           </div>
 
           <div class="row mt-3">
             <div class="col">
-              <div id="contacts-tbl"></div>
+              <div id="customers-tbl"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row js-main-contact-edit js-inner-part collapse">
+      <div class="row js-main-customer-edit js-inner-part collapse">
         <div class="col">
           <br />
-          <h2>Contact edit</h2>
+          <h2>Customer edit</h2>
 
           <div class="row">
             <div class="col">
-              <button type="button" class="btn btn-success js-contact-save-btn">
+              <button type="button" class="btn btn-success js-customer-save-btn">
                 <i class="fas fa-save"></i> Save changes</button>
-              <button type="button" class="btn btn-danger js-contact-delete-btn">
+              <button type="button" class="btn btn-danger js-customer-delete-btn">
                 <i class="fas fa-trash"></i> Remove</button>
-              <button type="button" class="btn btn-light js-contact-discard-btn">
+              <button type="button" class="btn btn-light js-customer-discard-btn">
                 <i class="fas fa-times"></i> Close</button>
             </div>
           </div>
@@ -170,12 +170,12 @@
           <!-- Name -->
           <div class="row mt-3">
             <div class="col-2 text-right">
-              <label for="contact-edit-name-box">
+              <label for="customer-edit-name-box">
                 <b>Name</b>
             </div>
             <div class="col">
-              <input type="hidden" id="contact-guid" />
-              <input type="text" class="form-control" id="contact-edit-name-box" />
+              <input type="hidden" id="customer-edit-id" />
+              <input type="text" class="form-control" id="customer-edit-name-box" />
             </div>
           </div>
 
