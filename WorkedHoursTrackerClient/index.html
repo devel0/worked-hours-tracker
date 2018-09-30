@@ -47,8 +47,8 @@
         <div class="col-auto">
           <button type="button" class="btn btn-primary js-users-btn js-admin-fn">
             <i class="fas fa-users"></i> Users</button>
-          <button type="button" class="btn btn-primary js-contacts-btn ml-1">
-            <i class="fas fa-address-card"></i> Contacts</button>          
+          <button type="button" class="btn btn-primary js-jobs-btn ml-1">
+            <i class="fas fa-address-card"></i> Jobs</button>          
           <button type="button" class="btn btn-primary js-report-btn ml-1">
             <i class="fas fa-file-excel"></i> Report</button>
         </div>
@@ -130,39 +130,39 @@
       </div>
 
       <!------------------------------------------------------------------------------------->
-      <!-- CUSTOMERS -->
+      <!-- JOBS -->
       <!------------------------------------------------------------------------------------->
-      <div class="row js-main-customers js-inner-part collapse">
+      <div class="row js-main-jobs js-inner-part collapse">
         <div class="col">
           <br />
-          <h2>Customers</h2>
+          <h2>Jobs</h2>
 
           <div class="row">
             <div class="col-auto">
-              <button type="button" class="btn btn-success js-customer-new-btn">Create</button>
+              <button type="button" class="btn btn-success js-job-new-btn">Create</button>
             </div>
           </div>
 
           <div class="row mt-3">
             <div class="col">
-              <div id="customers-tbl"></div>
+              <div id="jobs-tbl"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row js-main-customer-edit js-inner-part collapse">
+      <div class="row js-main-job-edit js-inner-part collapse">
         <div class="col">
           <br />
-          <h2>Customer edit</h2>
+          <h2>Job edit</h2>
 
           <div class="row">
             <div class="col">
-              <button type="button" class="btn btn-success js-customer-save-btn">
+              <button type="button" class="btn btn-success js-job-save-btn">
                 <i class="fas fa-save"></i> Save changes</button>
-              <button type="button" class="btn btn-danger js-customer-delete-btn">
+              <button type="button" class="btn btn-danger js-job-delete-btn">
                 <i class="fas fa-trash"></i> Remove</button>
-              <button type="button" class="btn btn-light js-customer-discard-btn">
+              <button type="button" class="btn btn-light js-job-discard-btn">
                 <i class="fas fa-times"></i> Close</button>
             </div>
           </div>
@@ -170,12 +170,12 @@
           <!-- Name -->
           <div class="row mt-3">
             <div class="col-2 text-right">
-              <label for="customer-edit-name-box">
+              <label for="job-edit-name-box">
                 <b>Name</b>
             </div>
             <div class="col">
-              <input type="hidden" id="customer-edit-id" />
-              <input type="text" class="form-control" id="customer-edit-name-box" />
+              <input type="hidden" id="job-edit-id" />
+              <input type="text" class="form-control" id="job-edit-name-box" />
             </div>
           </div>
 
@@ -252,7 +252,7 @@
   <!-- app -->
   <script src="app.js"></script>
   <script src="users.js"></script>
-  <script src="contacts.js"></script>
+  <script src="jobs.js"></script>
   <script src="report.js"></script>
 </body>
 

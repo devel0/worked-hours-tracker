@@ -24,8 +24,8 @@ window.onpopstate = function (e) {
         if (!tryDiscardUserEdit()) {
             this.history.pushState(null, 'edit', '#edit');
         }
-    } else if (state == 'customer-edit' && loc.hash == '') {
-        if (!tryDiscardCustomerEdit()) {
+    } else if (state == 'job-edit' && loc.hash == '') {
+        if (!tryDiscardJobEdit()) {
             this.history.pushState(null, 'edit', '#edit');
         }
     }

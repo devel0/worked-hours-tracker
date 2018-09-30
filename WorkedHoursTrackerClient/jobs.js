@@ -1,14 +1,14 @@
 //-------------------------------------------------------------------------
-// contacts
+// jobs
 //-------------------------------------------------------------------------
-$('.js-contacts-btn').click(function (e) {
-    gotoState('customers');
-    reloadCustomers();
+$('.js-jobs-btn').click(function (e) {
+    gotoState('jobs');
+    reloadJobs();
 });
 
-// load contacts list
-function reloadCustomers() {
-    $.post(urlbase + '/Api/CustomerList',
+// load jobs list
+function reloadJobs() {
+    $.post(urlbase + '/Api/JobList',
         {
             username: username,
             password: password
@@ -21,14 +21,14 @@ function reloadCustomers() {
                 html += '<th scope="col">Name</th>';                
                 html += '</tr></thead>';
                 html += '<tbody>';
-                _.each(_.sortBy(data.customerList, (x) => x.name), (x) => {
+                _.each(_.sortBy(data.jobList, (x) => x.name), (x) => {
                     html += '<tr>';
-                    html += '<td><a href="#edit" onclick="openCustomer(\'' + x.id + '\');">' + x.name + '</a></td>';                    
+                    html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.name + '</a></td>';                    
                     html += '</tr>';
                 });
                 html += '</tbody>';
                 html += '</table>';
-                $('#customers-tbl').html(html);
+                $('#jobs-tbl').html(html);
             } else {
                 $.notify('invalid login', 'error');
                 gotoState('login');
@@ -36,34 +36,34 @@ function reloadCustomers() {
         });
 }
 
-function clearCustomerEdit() {
-    $('#customer-edit-id')[0].value = '0';
-    $('#customer-edit-name-box')[0].value = '';
+function clearJobEdit() {
+    $('#job-edit-id')[0].value = '0';
+    $('#job-edit-name-box')[0].value = '';
 }
 
-function buildCustomerEditObj() {
+function buildJobEditObj() {
     return {
-        id: $('#customer-edit-id')[0].value,
-        name: $('#customer-edit-name-box')[0].value
+        id: $('#job-edit-id')[0].value,
+        name: $('#job-edit-name-box')[0].value
     };
 }
 
-function isEmptyContactObj(o) {
-    return $.trim($('#customer-edit-name-box')[0].value) == "";
+function isEmptyJobObj(o) {
+    return $.trim($('#job-edit-name-box')[0].value) == "";
 }
 
-// create customer
-$('.js-customer-new-btn').click(function (e) {
-    clearCustomerEdit();
+// create job
+$('.js-job-new-btn').click(function (e) {
+    clearJobEdit();
 
-    contactEditOrig = JSON.stringify(buildCustomerEditObj());
+    jobEditOrig = JSON.stringify(buildJobEditObj());
 
-    gotoState('customer-edit');
+    gotoState('job-edit');
 })
 
-// edit customer
-function openCustomer(id) {
-    $.post(urlbase + '/Api/LoadCustomer',
+// edit job
+function openJob(id) {
+    $.post(urlbase + '/Api/LoadJob',
         {
             username: username,
             password: password,
@@ -72,12 +72,12 @@ function openCustomer(id) {
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
-                $('#customer-edit-name-box')[0].value = data.customer.name;
-                $('#customer-edit-id')[0].value = data.customer.id;
+                $('#job-edit-name-box')[0].value = data.job.name;
+                $('#job-edit-id')[0].value = data.job.id;
 
-                contactEditOrig = JSON.stringify(buildCustomerEditObj());
+                jobEditOrig = JSON.stringify(buildJobEditObj());
 
-                gotoState('customer-edit');
+                gotoState('job-edit');
             } else {
                 $.notify('invalid login', 'error');
                 gotoState('login');
@@ -85,69 +85,69 @@ function openCustomer(id) {
         });
 }
 
-// save customer
-$('.js-customer-save-btn').click(function (e) {
-    if (isEmptyContactObj()) {
+// save job
+$('.js-job-save-btn').click(function (e) {
+    if (isEmptyJobObj()) {
         $.notify('cannot save empty', 'warning');
         return;
     }
 
     $.post(
-        urlbase + '/Api/SaveCustomer',
+        urlbase + '/Api/SaveJob',
         {
             username: username,
             password: password,
-            jCustomer: buildCustomerEditObj()
+            jJob: buildJobEditObj()
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiInvalidAuth(data)) showPart('.js-login');
             else {
                 $.notify('data saved', 'success');
-                gotoState('customers');
-                reloadCustomers();
+                gotoState('jobs');
+                reloadJobs();
             }
         }
     );
 
 })
 
-// remove customer
-$('.js-customer-delete-btn').click(function (e) {
+// remove job
+$('.js-job-delete-btn').click(function (e) {
     if (confirm('sure to delete ?')) {
         $.post(
-            urlbase + '/Api/DeleteCustomer',
+            urlbase + '/Api/DeleteJob',
             {
                 username: username,
                 password: password,
-                id: $('#customer-edit-id')[0].value
+                id: $('#job-edit-id')[0].value
             },
             function (data, status, jqXHR) {
                 if (checkApiError(data)) return;
                 if (checkApiInvalidAuth(data)) showPart('.js-login');
                 else {
                     $.notify('data saved', 'success');
-                    gotoState('customers');
-                    reloadCustomers();
+                    gotoState('jobs');
+                    reloadJobs();
                 }
             }
         );
     }
 })
 
-// close contact
-let contactEditOrig = null;
+// close job
+let jobEditOrig = null;
 
-function tryDiscardCustomerEdit() {
-    if (JSON.stringify(buildCustomerEditObj()) == contactEditOrig || confirm('Discard changes ?') == true) {
-        gotoState('customers');
+function tryDiscardJobEdit() {
+    if (JSON.stringify(buildJobEditObj()) == jobEditOrig || confirm('Discard changes ?') == true) {
+        gotoState('jobs');
         return true;
     }
     return false;
 }
 
-$('.js-customer-discard-btn').click(function (e) {
-    if (tryDiscardCustomerEdit()) {
+$('.js-job-discard-btn').click(function (e) {
+    if (tryDiscardJobEdit()) {
         history.pushState(null, '', '/');
     }
 })

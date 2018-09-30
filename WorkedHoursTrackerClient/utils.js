@@ -31,15 +31,15 @@ function gotoState(newstate) {
             }
             break;
 
-        case 'customers':
+        case 'jobs':
             {
-                showInnerPart('.js-main', '.js-main-customers');
+                showInnerPart('.js-main', '.js-main-jobs');
             }
             break;
 
-        case 'customer-edit':
+        case 'job-edit':
             {
-                showInnerPart('.js-main', '.js-main-customer-edit');
+                showInnerPart('.js-main', '.js-main-job-edit');
             }
             break;        
 

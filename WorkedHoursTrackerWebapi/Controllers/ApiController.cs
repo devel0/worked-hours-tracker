@@ -195,28 +195,28 @@ namespace WorkedHoursTrackerWebapi.Controllers
         #region CONTACTS
 
         [HttpPost]
-        public CommonResponse SaveCustomer(string username, string password, Customer jCustomer)
+        public CommonResponse SaveJob(string username, string password, Job jJob)
         {
             try
             {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                Customer customer = null;
-                if (jCustomer.id == 0)
+                Job job = null;
+                if (jJob.id == 0)
                 {
-                    customer = new Customer()
+                    job = new Job()
                     {
                         CreateTimestamp = DateTime.UtcNow
                     };
                     
-                    ctx.Customers.Add(customer);
+                    ctx.Jobs.Add(job);
                 }
                 else
                 {
-                    customer = ctx.Customers.FirstOrDefault(w => w.id == jCustomer.id);
-                    if (customer == null) throw new Exception($"unable to find [{jCustomer.id}] entry");
+                    job = ctx.Jobs.FirstOrDefault(w => w.id == jJob.id);
+                    if (job == null) throw new Exception($"unable to find [{jJob.id}] entry");
                 }
-                customer.Name = jCustomer.Name.Trim();
+                job.Name = jJob.Name.Trim();
                 ctx.SaveChanges();
 
                 return SuccessfulResponse();
@@ -228,7 +228,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadCustomer(string username, string password, int id)
+        public CommonResponse LoadJob(string username, string password, int id)
         {
             try
             {
@@ -236,7 +236,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new ContactInfoResponse();
 
-                response.Customer = ctx.Customers.FirstOrDefault(w => w.id == id);
+                response.Job = ctx.Jobs.FirstOrDefault(w => w.id == id);
 
                 return response;
             }
@@ -247,17 +247,17 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteCustomer(string username, string password, int id)
+        public CommonResponse DeleteJob(string username, string password, int id)
         {
             try
             {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var q = ctx.Customers.FirstOrDefault(w => w.id == id);
+                var q = ctx.Jobs.FirstOrDefault(w => w.id == id);
 
                 if (q != null)
                 {
-                    ctx.Customers.Remove(q);
+                    ctx.Jobs.Remove(q);
                     ctx.SaveChanges();
                 }
 
@@ -270,15 +270,15 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse CustomerList(string username, string password, string filter)
+        public CommonResponse JobList(string username, string password, string filter)
         {
             try
             {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var response = new CustomerListResponse();
+                var response = new JobListResponse();
 
-                response.customerList = ctx.Customers.ToList().Where(r => new[] { r.Name }.MatchesFilter(filter)).ToList();
+                response.jobList = ctx.Jobs.ToList().Where(r => new[] { r.Name }.MatchesFilter(filter)).ToList();
 
                 return response;
             }

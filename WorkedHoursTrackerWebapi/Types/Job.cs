@@ -5,8 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WorkedHoursTrackerWebapi
 {
 
-    [Table("customer")]
-    public class Customer
+    [Table("job")]
+    public class Job
     {
         [Key]
         public long id { get; set; }
