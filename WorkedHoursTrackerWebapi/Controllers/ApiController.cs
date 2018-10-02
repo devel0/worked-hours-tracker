@@ -235,7 +235,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadJob(string username, string password, int id)
+        public CommonResponse LoadJob(string username, string password, int id_job)
         {
             try
             {
@@ -243,7 +243,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new ContactInfoResponse();
 
-                response.Job = ctx.Jobs.FirstOrDefault(w => w.id == id);
+                response.Job = ctx.Jobs.FirstOrDefault(w => w.id == id_job);
 
                 return response;
             }
@@ -254,13 +254,13 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteJob(string username, string password, int id)
+        public CommonResponse DeleteJob(string username, string password, int id_job)
         {
             try
             {
                 if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var q = ctx.Jobs.FirstOrDefault(w => w.id == id);
+                var q = ctx.Jobs.FirstOrDefault(w => w.id == id_job);
 
                 if (q != null)
                 {
@@ -351,7 +351,7 @@ group by uj.id_job";
         #region USER JOB
 
         [HttpPost]
-        public CommonResponse TriggerJob(string username, string password, int idJob)
+        public CommonResponse TriggerJob(string username, string password, int id_job)
         {
             try
             {
@@ -360,7 +360,7 @@ group by uj.id_job";
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
 
-                var job = ctx.Jobs.First(w => w.id == idJob);
+                var job = ctx.Jobs.First(w => w.id == id_job);
 
                 var last = ctx.UserJobs.Where(r => r.user.id == id_user).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
 

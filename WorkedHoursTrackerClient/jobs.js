@@ -31,15 +31,15 @@ function reloadJobs() {
                     html += '<tr>';
                     if (username == 'admin') {
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.name + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.baseCost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.minCost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.costFactor + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.minutesRound + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.base_cost + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.min_cost + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.cost_factor + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.minutes_round + '</a></td>';
                     }
                     else
                         html += '<td>' + x.name + '</td>';
 
-                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.id + '\');">' + (x.isActive ? "Deactivate" : "Activate") + '</a></td>';
+                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a></td>';
 
                     html += '</tr>';
                 });
@@ -62,10 +62,10 @@ function buildJobEditObj() {
     return {
         id: $('#job-edit-id')[0].value,
         name: $('#job-edit-name-box')[0].value,
-        baseCost: $('#job-edit-basecost-box')[0].value,
-        minCost: $('#job-edit-mincost-box')[0].value,
-        costFactor: $('#job-edit-costfactor-box')[0].value,
-        minutesRound: $('#job-edit-minutesround-box')[0].value
+        base_cost: $('#job-edit-basecost-box')[0].value,
+        min_cost: $('#job-edit-mincost-box')[0].value,
+        cost_factor: $('#job-edit-costfactor-box')[0].value,
+        minutes_round: $('#job-edit-minutesround-box')[0].value
     };
 }
 
@@ -88,17 +88,17 @@ function openJob(id) {
         {
             username: username,
             password: password,
-            id: id
+            id_job: id
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 $('#job-edit-name-box')[0].value = data.job.name;
                 $('#job-edit-id')[0].value = data.job.id;
-                $('#job-edit-basecost-box')[0].value = data.job.baseCost;
-                $('#job-edit-mincost-box')[0].value = data.job.minCost;
-                $('#job-edit-costfactor-box')[0].value = data.job.costFactor;
-                $('#job-edit-minutesround-box')[0].value = data.job.minutesRound;
+                $('#job-edit-basecost-box')[0].value = data.job.base_cost;
+                $('#job-edit-mincost-box')[0].value = data.job.min_cost;
+                $('#job-edit-costfactor-box')[0].value = data.job.cost_factor;
+                $('#job-edit-minutesround-box')[0].value = data.job.minutes_round;
 
                 jobEditOrig = JSON.stringify(buildJobEditObj());
 
@@ -111,12 +111,12 @@ function openJob(id) {
 }
 
 // trigger job
-function openJob(id) {
+function triggerJob(id) {
     $.post(urlbase + '/Api/TriggerJob',
         {
             username: username,
             password: password,            
-            idJob: $('#job-edit-id')[0].value
+            id_job: $('#job-edit-id')[0].value
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
@@ -164,7 +164,7 @@ $('.js-job-delete-btn').click(function (e) {
             {
                 username: username,
                 password: password,
-                id: $('#job-edit-id')[0].value
+                id_job: $('#job-edit-id')[0].value
             },
             function (data, status, jqXHR) {
                 if (checkApiError(data)) return;
