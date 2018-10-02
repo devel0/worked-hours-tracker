@@ -35,7 +35,7 @@ namespace WorkedHoursTrackerWebapi
         public double total_hours { get; set; }
 
         [NotMapped]
-        public double Last24Hours { get; set; }
+        public double last_24_hours { get; set; }
 
         public double Cost(double hours, double hourCost)
         {
@@ -46,12 +46,12 @@ namespace WorkedHoursTrackerWebapi
         /// <summary>
         /// create timestamp ( UTC )
         /// </summary>    
-        public DateTime CreateTimestamp { get; set; }
+        public DateTime create_timestamp { get; set; }
 
         /// <summary>
         /// modify timestamp ( UTC )
         /// </summary>
-        public DateTime? ModifyTimestamp { get; set; }
+        public DateTime? modify_timestamp { get; set; }
 
     }
 

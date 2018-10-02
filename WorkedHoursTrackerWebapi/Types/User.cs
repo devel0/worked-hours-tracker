@@ -13,28 +13,28 @@ namespace WorkedHoursTrackerWebapi
         public int id { get; set; }
 
         [Required]
-        public string Username { get; set; }
+        public string username { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        public string password { get; set; }
 
-        public double Cost { get; set; }
+        public double cost { get; set; }
 
         [Required]
         /// <summary>
         /// create timestamp ( UTC )
         /// </summary>    
-        public DateTime CreateTimestamp { get; set; }
+        public DateTime create_timestamp { get; set; }
 
         /// <summary>
         /// modify timestamp ( UTC )
         /// </summary>
-        public DateTime? ModifyTimestamp { get; set; }
+        public DateTime? modify_timestamp { get; set; }
 
         /// <summary>
         /// last login timestamp ( UTC )
         /// </summary>
-        public DateTime? LastloginTimestamp { get; set; }
+        public DateTime? last_login_timestamp { get; set; }
 
     }
 

@@ -33,13 +33,13 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
         void EnsureAdminAccount()
         {
-            if (!ctx.Users.Any(w => w.Username == "admin"))
+            if (!ctx.Users.Any(w => w.username == "admin"))
             {
                 ctx.Users.Add(new User()
                 {
-                    Username = "admin",
-                    Password = "admin",
-                    CreateTimestamp = DateTime.Now
+                    username = "admin",
+                    password = "admin",
+                    create_timestamp = DateTime.Now
                 });
                 ctx.SaveChanges();
             }
@@ -68,9 +68,9 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
         bool CheckAuth(string username, string password)
         {
-            var qdb = ctx.Users.FirstOrDefault(w => w.Username == username);
+            var qdb = ctx.Users.FirstOrDefault(w => w.username == username);
 
-            var is_valid = qdb != null && qdb.Password == password;
+            var is_valid = qdb != null && qdb.password == password;
 
             if (!is_valid)
             {
@@ -100,12 +100,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 if (jUser.id == 0)
                 {
-                    if (jUser.Username == "admin") throw new Exception($"cannot create builtin admin account");
+                    if (jUser.username == "admin") throw new Exception($"cannot create builtin admin account");
 
                     user = new User()
                     {
-                        Username = jUser.Username,
-                        CreateTimestamp = DateTime.UtcNow
+                        username = jUser.username,
+                        create_timestamp = DateTime.UtcNow
                     };
 
                     ctx.Users.Add(user);
@@ -115,10 +115,10 @@ namespace WorkedHoursTrackerWebapi.Controllers
                     user = ctx.Users.FirstOrDefault(w => w.id == jUser.id);
                     if (user == null) throw new Exception($"unable to find [{jUser.id}] entry");
 
-                    user.ModifyTimestamp = DateTime.UtcNow;
+                    user.modify_timestamp = DateTime.UtcNow;
                 }
-                user.Password = jUser.Password?.Trim();
-                user.Cost = jUser.Cost;
+                user.password = jUser.password?.Trim();
+                user.cost = jUser.cost;
 
                 ctx.SaveChanges();
 
@@ -183,7 +183,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new UserListResponse();
 
-                response.UserList = ctx.Users.ToList().Where(r => new[] { r.Username }.MatchesFilter(filter)).ToList();
+                response.UserList = ctx.Users.ToList().Where(r => new[] { r.username }.MatchesFilter(filter)).ToList();
 
                 return response;
             }
@@ -209,7 +209,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 {
                     job = new Job()
                     {
-                        CreateTimestamp = DateTime.UtcNow
+                        create_timestamp = DateTime.UtcNow
                     };
 
                     ctx.Jobs.Add(job);
@@ -291,7 +291,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new JobListResponse();
 
-                var user = ctx.Users.First(w => w.Username == username);
+                var user = ctx.Users.First(w => w.username == username);
 
                 var query = $@"
 select uj.id_job, sum(uj.hours_increment) hours_sum from ""user"" u
@@ -321,7 +321,7 @@ group by uj.id_job";
                         x.total_hours = resTotalHours[x.id].GetValueOrDefault();
                         double? last24h = null;
                         if (resLast24Hours.TryGetValue(x.id, out last24h))
-                            x.Last24Hours = last24h.GetValueOrDefault();
+                            x.last_24_hours = last24h.GetValueOrDefault();
                     }
 
                     if (username != "admin")
@@ -357,7 +357,7 @@ group by uj.id_job";
             {
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
-                var user = ctx.Users.First(w => w.Username == username);
+                var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
 
                 var job = ctx.Jobs.First(w => w.id == idJob);
