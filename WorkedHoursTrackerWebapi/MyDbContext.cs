@@ -8,21 +8,30 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace WorkedHoursTrackerWebapi
 {
-/*
-    public class MyDbContextFactory : IDesignTimeDbContextFactory<MyDbContext>
-    {
+    /*
+        public class MyDbContextFactory : IDesignTimeDbContextFactory<MyDbContext>
+        {
 
-        public MyDbContext CreateDbContext(string[] args)
-        {            
-            var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();            
-            optionsBuilder.UseNpgsql(config.ConnectionString);
+            public MyDbContext CreateDbContext(string[] args)
+            {            
+                var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();            
+                optionsBuilder.UseNpgsql(config.ConnectionString);
 
-            return new MyDbContext(optionsBuilder.Options);
-        }
-    }*/
+                return new MyDbContext(optionsBuilder.Options);
+            }
+        }*/
 
     public class MyDbContext : DbContext
     {
+
+        public const double MIN_COST_DEFAULT = 0.0;
+
+        public const double BASE_COST_DEFAULT = 0.0;
+
+        public const double COST_FACTOR_DEFAULT = 1.0;
+
+        public const int MINUTES_ROUND_DEFAULT = 1;
+
 
         public MyDbContext(DbContextOptions options) : base(options)
         {
@@ -75,7 +84,7 @@ namespace WorkedHoursTrackerWebapi
             //
             // INDEX
             //
-            //builder.Entity<Doc>().HasIndex(x => x.uuid);
+            builder.Entity<UserJob>().HasIndex(x => x.trigger_timestamp);
 
             //
             // DELETE BEHAVIOR
@@ -88,12 +97,17 @@ namespace WorkedHoursTrackerWebapi
             //
             // DEFAULT VALUES
             //
-            //builder.Entity<Doc>().Property(p => p.item2).HasDefaultValue(22);            
+            builder.Entity<Job>().Property(p => p.min_cost).HasDefaultValue(MIN_COST_DEFAULT);
+            builder.Entity<Job>().Property(p => p.base_cost).HasDefaultValue(BASE_COST_DEFAULT);
+            builder.Entity<Job>().Property(p => p.cost_factor).HasDefaultValue(COST_FACTOR_DEFAULT);
+            builder.Entity<Job>().Property(p => p.minutes_round).HasDefaultValue(MINUTES_ROUND_DEFAULT);
         }
 
         public DbSet<User> Users { get; set; }
 
         public DbSet<Job> Jobs { get; set; }
+
+        public DbSet<UserJob> UserJobs { get; set; }
     }
 
 }

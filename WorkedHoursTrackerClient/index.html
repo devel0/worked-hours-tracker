@@ -48,7 +48,7 @@
           <button type="button" class="btn btn-primary js-users-btn js-admin-fn">
             <i class="fas fa-users"></i> Users</button>
           <button type="button" class="btn btn-primary js-jobs-btn ml-1">
-            <i class="fas fa-address-card"></i> Jobs</button>          
+            <i class="fas fa-address-card"></i> Jobs</button>
           <button type="button" class="btn btn-primary js-report-btn ml-1">
             <i class="fas fa-file-excel"></i> Report</button>
         </div>
@@ -121,7 +121,7 @@
               <label for="user-edit-cost-box">
                 <b>Cost</b>
             </div>
-            <div class="col">              
+            <div class="col">
               <input type="text" class="form-control" id="user-edit-cost-box" />
             </div>
           </div>
@@ -179,6 +179,51 @@
             </div>
           </div>
 
+          <!-- BaseCost -->
+          <div class="row mt-3 js-admin-fn">
+            <div class="col-2 text-right">
+              <label for="job-edit-basecost-box">
+                <b>Cost (base)</b>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" id="job-edit-basecost-box" value="0" />
+            </div>
+          </div>
+
+          <!-- MinCost -->
+          <div class="row mt-3 js-admin-fn">
+            <div class="col-2 text-right">
+              <label for="job-edit-mincost-box">
+                <b>Cost (min)</b>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" id="job-edit-mincost-box" value="0"/>
+            </div>
+          </div>
+
+          <!-- CostFactor -->
+          <div class="row mt-3 js-admin-fn">
+            <div class="col-2 text-right">
+              <label for="job-edit-costfactor-box">
+                <b>Cost (factor)</b>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" id="job-edit-costfactor-box" value="1" />
+            </div>
+          </div>
+
+          <!-- MinutesRound -->
+          <div class="row mt-3 js-admin-fn">
+            <div class="col-2 text-right">
+              <label for="job-edit-minutesround-box">
+                <b>Minutes round</b>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" id="job-edit-minutesround-box" value="1"/>
+            </div>
+          </div>
+
+
         </div>
       </div>
 
@@ -192,7 +237,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- js-login -->
     <div class="container-fluid collapse js-part js-login">
       <div class="row">

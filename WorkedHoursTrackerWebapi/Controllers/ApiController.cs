@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SearchAThing.Util;
+using SearchAThing.EFUtil;
+using SearchAThing.PsqlUtil;
 
 namespace WorkedHoursTrackerWebapi.Controllers
 {
@@ -192,14 +195,14 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
         #endregion
 
-        #region CONTACTS
+        #region JOBS
 
         [HttpPost]
         public CommonResponse SaveJob(string username, string password, Job jJob)
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 Job job = null;
                 if (jJob.id == 0)
@@ -208,7 +211,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                     {
                         CreateTimestamp = DateTime.UtcNow
                     };
-                    
+
                     ctx.Jobs.Add(job);
                 }
                 else
@@ -216,7 +219,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
                     job = ctx.Jobs.FirstOrDefault(w => w.id == jJob.id);
                     if (job == null) throw new Exception($"unable to find [{jJob.id}] entry");
                 }
-                job.Name = jJob.Name.Trim();
+                job.name = jJob.name.Trim();
+                job.base_cost = jJob.base_cost;
+                job.min_cost = jJob.min_cost;
+                job.cost_factor = jJob.cost_factor;
+                job.minutes_round = jJob.minutes_round;
                 ctx.SaveChanges();
 
                 return SuccessfulResponse();
@@ -232,7 +239,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new ContactInfoResponse();
 
@@ -251,7 +258,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var q = ctx.Jobs.FirstOrDefault(w => w.id == id);
 
@@ -269,6 +276,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
         }
 
+        public class tmptype
+        {
+            public long id_job;
+            public double? hours_sum;
+        }
+
         [HttpPost]
         public CommonResponse JobList(string username, string password, string filter)
         {
@@ -278,7 +291,52 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new JobListResponse();
 
-                response.jobList = ctx.Jobs.ToList().Where(r => new[] { r.Name }.MatchesFilter(filter)).ToList();
+                var user = ctx.Users.First(w => w.Username == username);
+
+                var query = $@"
+select uj.id_job, sum(uj.hours_increment) hours_sum from ""user"" u
+left join userjob uj on u.id = uj.id_user
+where uj.id_user={user.id}
+group by uj.id_job";
+
+                var resTotalHours = ctx.ExecSQL<tmptype>(query).ToDictionary(w => w.id_job, w => w.hours_sum);
+
+                if (resTotalHours.Count > 0)
+                {
+
+                    query = $@"
+select uj.id_job, sum(uj.hours_increment) hours_sum from ""user"" u
+left join userjob uj on u.id = uj.id_user
+where uj.id_user={user.id} and uj.trigger_timestamp>{(DateTime.UtcNow - TimeSpan.FromDays(1)).ToPsql()}
+group by uj.id_job";
+
+                    var resLast24Hours = ctx.ExecSQL<tmptype>(query).ToDictionary(w => w.id_job, w => w.hours_sum);
+
+                    query = $"select * from job where id in ({string.Join(',', resTotalHours.Select(w => w.Key.ToString()))})";
+
+                    response.jobList = ctx.Jobs.AsNoTracking().FromSql(query).ToList();
+
+                    foreach (var x in response.jobList)
+                    {
+                        x.total_hours = resTotalHours[x.id].GetValueOrDefault();
+                        double? last24h = null;
+                        if (resLast24Hours.TryGetValue(x.id, out last24h))
+                            x.Last24Hours = last24h.GetValueOrDefault();
+                    }
+
+                    if (username != "admin")
+                    {
+                        foreach (var x in response.jobList)
+                        {
+                            x.base_cost = 0;
+                            x.min_cost = 0;
+                            x.cost_factor = 0;
+                            x.minutes_round = 0;
+                        }
+                    }
+                }
+                else
+                    response.jobList = new List<Job>();
 
                 return response;
             }
@@ -287,6 +345,65 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 return ErrorResponse(ex.Message);
             }
         }
+
+        #endregion
+
+        #region USER JOB
+
+        [HttpPost]
+        public CommonResponse TriggerJob(string username, string password, int idJob)
+        {
+            try
+            {
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                var user = ctx.Users.First(w => w.Username == username);
+                var id_user = user.id;
+
+                var job = ctx.Jobs.First(w => w.id == idJob);
+
+                var last = ctx.UserJobs.Where(r => r.user.id == id_user).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
+
+                UserJob newEntry = null;
+                newEntry = new UserJob()
+                {
+                    user = user,
+                    job = job,
+                    trigger_timestamp = DateTime.UtcNow
+                };
+                if (last == null)
+                {
+                    newEntry.is_active = true;
+                }
+                else
+                {
+                    switch (last.is_active)
+                    {
+                        case true:
+                            {
+                                newEntry.is_active = false;
+                                newEntry.hours_increment = (newEntry.trigger_timestamp - last.trigger_timestamp).TotalHours;
+                            }
+                            break;
+
+                        case false:
+                            {
+                                newEntry.is_active = true;
+                            }
+                            break;
+                    }
+                }
+                ctx.UserJobs.Add(newEntry);
+                ctx.SaveChanges();
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
 
         #endregion
 
