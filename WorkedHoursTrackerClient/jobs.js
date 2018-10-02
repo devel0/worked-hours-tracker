@@ -25,6 +25,9 @@ function reloadJobs() {
                     html += '<th scope="col">Cost (factor)</th>';
                     html += '<th scope="col">Minutes round</th>';
                 }
+                html += '<th scope="col">Total (hr)</th>';
+                html += '<th scope="col">Last24 (hr)</th>';
+                html += '<th scope="col">Action</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
                 _.each(_.sortBy(data.jobList, (x) => x.name), (x) => {
@@ -38,6 +41,9 @@ function reloadJobs() {
                     }
                     else
                         html += '<td>' + x.name + '</td>';
+
+                    html += '<td>' + x.total_hours.toFixed(1) + '</td>';
+                    html += '<td>' + x.last_24_hours.toFixed(1) + '</td>';
 
                     html += '<td><a href="#edit" onclick="triggerJob(\'' + x.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a></td>';
 
@@ -115,16 +121,16 @@ function triggerJob(id) {
     $.post(urlbase + '/Api/TriggerJob',
         {
             username: username,
-            password: password,            
-            id_job: $('#job-edit-id')[0].value
+            password: password,
+            id_job: id
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
-            if (checkApiSuccessful(data)) {
-                alert('did it');
+            if (checkApiSuccessful(data)) {                
+                reloadJobs();
             } else {
                 $.notify('invalid login', 'error');
-                gotoState('login');
+                gotoState('login');                
             }
         });
 }

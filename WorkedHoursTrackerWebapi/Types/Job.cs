@@ -29,7 +29,7 @@ namespace WorkedHoursTrackerWebapi
         public int minutes_round { get; set; } = MyDbContext.MINUTES_ROUND_DEFAULT;
 
         [NotMapped]
-        public bool is_active { get; set; } = true;
+        public bool is_active { get; set; }
 
         [NotMapped]
         public double total_hours { get; set; }

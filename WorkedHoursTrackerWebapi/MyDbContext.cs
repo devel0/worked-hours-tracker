@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using SearchAThing.PsqlUtil;
 
 namespace WorkedHoursTrackerWebapi
 {
@@ -32,9 +33,20 @@ namespace WorkedHoursTrackerWebapi
 
         public const int MINUTES_ROUND_DEFAULT = 1;
 
+        static bool psql_initialized = false;
+        static object lck_psql_initialized = new object();
+
 
         public MyDbContext(DbContextOptions options) : base(options)
         {
+            if (!psql_initialized)
+            {
+                lock (lck_psql_initialized)
+                {
+                    if (!psql_initialized) this.EnableFirstLastAggregateFunctions();
+                    psql_initialized = true;
+                }
+            }
         }
 
         void CheckValidate(IEnumerable<object> entities)

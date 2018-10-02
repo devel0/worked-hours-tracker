@@ -312,7 +312,20 @@ group by uj.id_job";
 
                     var resLast24Hours = ctx.ExecSQL<tmptype>(query).ToDictionary(w => w.id_job, w => w.hours_sum);
 
-                    query = $"select * from job where id in ({string.Join(',', resTotalHours.Select(w => w.Key.ToString()))})";
+                    // build job_ids
+                    var job_ids = string.Join(',', resTotalHours.Select(w => w.Key.ToString()));
+
+                    // retrieve is_active
+                    query = $@"
+select a.id_job from
+(
+select uj.id_job, first(uj.is_active order by uj.trigger_timestamp desc) is_active from userjob uj
+where uj.id_user={user.id} and uj.id_job in ({job_ids})
+group by id_job
+) a where a.is_active";
+                    var resActiveJobs = ctx.ExecSQL<long>(query).ToHashSet();
+
+                    query = $"select * from job where id in ({job_ids})";
 
                     response.jobList = ctx.Jobs.AsNoTracking().FromSql(query).ToList();
 
@@ -322,6 +335,7 @@ group by uj.id_job";
                         double? last24h = null;
                         if (resLast24Hours.TryGetValue(x.id, out last24h))
                             x.last_24_hours = last24h.GetValueOrDefault();
+                        x.is_active = resActiveJobs.Contains(x.id);
                     }
 
                     if (username != "admin")

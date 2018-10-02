@@ -10,12 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0-preview2-35157" />
-    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
-    <PackageReference Include="netcore-ef-util" Version="1.0.0-CI00018" />
-    <PackageReference Include="netcore-psql-util" Version="1.0.0-CI00008" />    
-    <PackageReference Include="netcore-util" Version="1.0.0-CI00049" />    
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0-preview1" /> 
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />    
+    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />    
+    <PackageReference Include="netcore-ef-util" Version="1.0.0-CI00020" />    
+    <PackageReference Include="netcore-psql-util" Version="1.0.0-CI00009" />        
+    <PackageReference Include="netcore-util" Version="1.0.0-CI00049" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />        
   </ItemGroup>
 
 </Project>
