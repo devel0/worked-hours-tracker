@@ -21,11 +21,11 @@ function timeChecker() {
                 let hh = Math.trunc(hdiff);
                 let mdiff = (hdiff - hh) * 60;
                 let mm = Math.trunc(mdiff);
-                let ss =  Math.trunc((mdiff - mm) * 60);
+                let ss = Math.trunc((mdiff - mm) * 60);
 
                 let hitem = $('#jtot_' + x.job.id);
-                
-                hitem[0].textContent = hh + ":" + mm; 
+
+                hitem[0].textContent = hh + ":" + mm;
             }
 
             {
@@ -33,10 +33,10 @@ function timeChecker() {
                 let hh = Math.trunc(hdiff);
                 let mdiff = (hdiff - hh) * 60;
                 let mm = Math.trunc(mdiff);
-                let ss =  Math.trunc((mdiff - mm) * 60);
+                let ss = Math.trunc((mdiff - mm) * 60);
 
                 let hitem = $('#j24_' + x.job.id);
-                
+
                 hitem[0].textContent = hh + ":" + mm + ":" + ss;
                 hitem.addClass('running-hours');
             }
@@ -73,17 +73,19 @@ function reloadJobs() {
                 _.each(dsJobs, (x) => {
                     html += '<tr>';
                     html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.name + '</a></td>';
-                    if (username == 'admin') {                                                
+                    if (username == 'admin') {
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.base_cost + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.min_cost + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.cost_factor + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.minutes_round + '</a></td>';
-                    }                    
-                    
+                    }
+
                     html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
                     html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
 
-                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a></td>';
+                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a> - ' +
+                        '<a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>'
+                    '</td>';
 
                     html += '</tr>';
                 });
@@ -222,6 +224,12 @@ $('.js-job-delete-btn').click(function (e) {
         );
     }
 })
+
+// edit job notes
+function editJobNotes(id) {
+    if (loadJobNote(id))
+        gotoState('job-edit-note');
+}
 
 // close job
 let jobEditOrig = null;

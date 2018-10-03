@@ -32,6 +32,8 @@ namespace WorkedHoursTrackerWebapi
         [Required]
         public double hours_increment { get; set; }
 
+        public string notes { get; set; }
+
     }
 
 }

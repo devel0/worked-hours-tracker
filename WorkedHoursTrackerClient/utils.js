@@ -41,7 +41,13 @@ function gotoState(newstate) {
             {
                 showInnerPart('.js-main', '.js-main-job-edit');
             }
-            break;        
+            break;
+
+        case 'job-edit-note':
+            {
+                showInnerPart('.js-main', '.js-main-job-edit-note');                
+            }
+            break;
 
         case 'report':
             {

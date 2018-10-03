@@ -103,7 +103,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                     if (jUser.username == "admin") throw new Exception($"cannot create builtin admin account");
 
                     user = new User()
-                    {                        
+                    {
                         create_timestamp = DateTime.UtcNow
                     };
 
@@ -113,7 +113,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 {
                     user = ctx.Users.FirstOrDefault(w => w.id == jUser.id);
                     if (user == null) throw new Exception($"unable to find [{jUser.id}] entry");
-                
+
                     user.modify_timestamp = DateTime.UtcNow;
                 }
                 user.username = jUser.username;
@@ -397,7 +397,7 @@ group by id_job
 
         #endregion
 
-        #region USER JOB
+        #region USER JOB        
 
         [HttpPost]
         public CommonResponse TriggerJob(string username, string password, int id_job)
@@ -453,6 +453,60 @@ group by id_job
             }
         }
 
+        [HttpPost]
+        public CommonResponse GetJobNotes(string username, string password, int id_job)
+        {
+            try
+            {
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                var user = ctx.Users.First(w => w.username == username);
+                var id_user = user.id;
+
+                var job = ctx.Jobs.First(w => w.id == id_job);
+
+                var last = ctx.UserJobs.Where(r => r.user.id == id_user && r.job.id == id_job).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
+
+                if (last == null) throw new Exception($"no worked hours for this entry");
+
+
+                return new UserJobNotesResponse()
+                {
+                    Notes = last.notes
+                };
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        public CommonResponse SaveJobNotes(string username, string password, int id_job, string notes)
+        {
+            try
+            {
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+
+                var user = ctx.Users.First(w => w.username == username);
+                var id_user = user.id;
+
+                var job = ctx.Jobs.First(w => w.id == id_job);
+
+                var last = ctx.UserJobs.Where(r => r.user.id == id_user && r.job.id == id_job).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
+
+                last.notes = notes;
+
+                ctx.SaveChanges();
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
 
         #endregion
 

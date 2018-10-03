@@ -18,13 +18,17 @@ let filterTimer = null;
 window.onpopstate = function (e) {
     let loc = new this.URL(document.location);
 
-    console.log('onpostate loc:[' + loc + '] hash:[' + loc.hash + '] state:[' + state + ']');
+    //console.log('onpostate loc:[' + loc + '] hash:[' + loc.hash + '] state:[' + state + ']');
 
     if (state == 'user-edit' && loc.hash == '') {
         if (!tryDiscardUserEdit()) {
             this.history.pushState(null, 'edit', '#edit');
         }
     } else if (state == 'job-edit' && loc.hash == '') {
+        if (!tryDiscardJobEdit()) {
+            this.history.pushState(null, 'edit', '#edit');
+        }
+    } else if (state == 'job-edit-note' && loc.hash == '') {
         if (!tryDiscardJobEdit()) {
             this.history.pushState(null, 'edit', '#edit');
         }

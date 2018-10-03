@@ -19,7 +19,7 @@ namespace WorkedHoursTrackerWebapi
 
         public double total_hours { get; set; }
 
-        public double last_24_hours { get; set; }
+        public double last_24_hours { get; set; }        
 
     }
 

@@ -47,3 +47,13 @@ body
 {
     color: red;
 }
+
+.mytextarea {
+    margin:0px 0px;
+    padding:5px;
+    min-height:50px;
+    line-height:16px;
+    width:96%;
+    display:block;
+    margin:0px auto;    
+  }
