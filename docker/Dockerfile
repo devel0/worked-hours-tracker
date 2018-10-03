@@ -14,6 +14,8 @@ RUN \
 	npm install -g local-web-server
 
 COPY config.json /root/.config/workedhourstracker
+RUN chmod 700 /root/.config/workedhourstracker
+RUN sed -i 's/debugmode = true/debugmode = false/g'
 COPY supervisorwebapi.conf /etc/supervisor/conf.d
 COPY supervisorws.conf /etc/supervisor/conf.d
 
