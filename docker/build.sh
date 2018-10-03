@@ -6,6 +6,10 @@
 
 exdir=$(dirname `readlink -f "$0"`)
 
-if [ ! -e "$exdir"/clone ]; then mkdir "$exdir"/clone; cd "$exdir"/clone; git clone "$exdir"/../.; fi
+if [ ! -e "$exdir"/clone ]; then
+	mkdir "$exdir"/clone; cd "$exdir"/clone; git clone "$exdir"/../.;
+else
+	cd "$exdir"/clone; git pull
+fi
 
 docker build $args $* -t searchathing/wht -f "$exdir"/Dockerfile "$exdir"/.
