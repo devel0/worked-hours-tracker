@@ -1,7 +1,6 @@
 FROM searchathing/dotnet:bionic
 
 RUN mkdir -p /root/.config/workedhourstracker
-COPY config.json /root/.config/workedhourstracker
 
 COPY clone /src
 
@@ -14,6 +13,7 @@ RUN \
 RUN \
 	npm install -g local-web-server
 
+COPY config.json /root/.config/workedhourstracker
 COPY supervisorwebapi.conf /etc/supervisor/conf.d
 COPY supervisorws.conf /etc/supervisor/conf.d
 
