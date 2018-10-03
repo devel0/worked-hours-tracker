@@ -27,7 +27,15 @@ file appears like follow
 }
 ```
 
+- create an empty db from postgres
 - open `~/.config/workedhourstracker/config.json` and set parameters accordingly to your postgres db
+- create tables using
+
+```sh
+cd WorkedHoursTrackerWebapi
+dotnet ef migrations add migr1
+dotnet ef database update
+```
 
 ## screenshoots
 
