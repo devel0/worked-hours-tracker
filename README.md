@@ -7,6 +7,28 @@ web tracker of worked hours
 - admin access to create user, edit contacts, set user work cost, download report
 - user access to toggle work, download report own hours
 
+## install
+
+- first run generate follow error message
+
+```
+please configure [/home/devel0/.config/workedhourstracker/config.json] setting DBHostname, DBPort, DBName, DBUsername, DBPassword (see README.md)
+```
+
+file appears like follow
+
+```
+{
+  "DBHostname": "hostname",
+  "DBPort": 5432,
+  "DBName": "worked_hours_tracker",
+  "DBUsername": "postgres",
+  "DBPassword": "pass",  
+}
+```
+
+- open `~/.config/workedhourstracker/config.json` and set parameters accordingly to your postgres db
+
 ## how this project was created
 
 ```sh
