@@ -17,6 +17,8 @@ namespace WorkedHoursTrackerWebapi
         public string DBName { get; set; }
         public string DBUsername { get; set; }
         public string DBPassword { get; set; }
+
+        [JsonIgnore]
         public string ConnectionString
         {
             get
