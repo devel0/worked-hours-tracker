@@ -15,7 +15,7 @@ RUN \
 
 COPY config.json /root/.config/workedhourstracker
 RUN chmod 700 /root/.config/workedhourstracker
-RUN sed -i 's/debugmode = true/debugmode = false/g'
+RUN sed -i 's/debugmode = true/debugmode = false/g' /src/WorkedHoursTrackerClient/app.js
 COPY supervisorwebapi.conf /etc/supervisor/conf.d
 COPY supervisorws.conf /etc/supervisor/conf.d
 
