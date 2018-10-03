@@ -301,10 +301,13 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 var user = ctx.Users.First(w => w.username == username);
 
                 var query = $@"
-select uj.id_job, sum(uj.hours_increment) hours_sum from ""user"" u
-left join userjob uj on u.id = uj.id_user
-where uj.id_user={user.id}
-group by uj.id_job";
+select
+	j.id id_job, sum(uj.hours_increment) hours_sum
+from
+	job j
+left join
+	userjob uj on j.id = uj.id_job and uj.id_user={user.id}
+group by j.id";
 
                 var resTotalHours = ctx.ExecSQL<tmptype>(query).ToDictionary(w => w.id_job, w => w.hours_sum);
 
@@ -343,24 +346,32 @@ group by id_job
 
                     foreach (var job in jobList)
                     {
-                        var jnfo = resJobNfo[job.id];
                         var r = new UserJobNfo()
                         {
-                            job = job,
-                            is_active = jnfo.is_active,
-                            trigger_timestamp = jnfo.trigger_timestamp
+                            job = job
                         };
 
-                        if (r.is_active)
+                        tmptype2 jnfo = null;
+                        if (resJobNfo.TryGetValue(job.id, out jnfo))
                         {
-                            var working_increment_h = (DateTime.UtcNow - r.trigger_timestamp).TotalHours;
+                            r.is_active = jnfo.is_active;
+                            r.trigger_timestamp = jnfo.trigger_timestamp;
 
-                            r.total_hours = resTotalHours[job.id].GetValueOrDefault() + working_increment_h;
+                            r.total_hours = resTotalHours[job.id].GetValueOrDefault();
+
                             double? last24h = null;
                             if (resLast24Hours.TryGetValue(job.id, out last24h))
                                 r.last_24_hours = last24h.GetValueOrDefault();
-                            r.last_24_hours += working_increment_h;
+
+                            if (r.is_active)
+                            {
+                                var working_increment_h = (DateTime.UtcNow - r.trigger_timestamp).TotalHours;
+
+                                r.total_hours += working_increment_h;
+                                r.last_24_hours += working_increment_h;
+                            }
                         }
+
                         response.userJobList.Add(r);
                     }
 
@@ -400,7 +411,7 @@ group by id_job
 
                 var job = ctx.Jobs.First(w => w.id == id_job);
 
-                var last = ctx.UserJobs.Where(r => r.user.id == id_user).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
+                var last = ctx.UserJobs.Where(r => r.user.id == id_user && r.job.id == id_job).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
 
                 UserJob newEntry = null;
                 newEntry = new UserJob()
