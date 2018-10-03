@@ -72,15 +72,13 @@ function reloadJobs() {
                 dsJobs = _.sortBy(_.sortBy(data.userJobList, (x) => x.name), (x) => !x.is_active);
                 _.each(dsJobs, (x) => {
                     html += '<tr>';
-                    if (username == 'admin') {
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.name + '</a></td>';
+                    html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.name + '</a></td>';
+                    if (username == 'admin') {                                                
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.base_cost + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.min_cost + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.cost_factor + '</a></td>';
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.minutes_round + '</a></td>';
-                    }
-                    else
-                        html += '<td>' + x.name + '</td>';
+                    }                    
                     
                     html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
                     html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
