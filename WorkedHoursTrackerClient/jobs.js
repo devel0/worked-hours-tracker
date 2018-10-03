@@ -7,14 +7,39 @@ $('.js-jobs-btn').click(function (e) {
 });
 
 var dsJobs = null;
+var dsJobsQueryTime = null;
 setInterval(timeChecker, 3000);
 
 function timeChecker() {
+    if (dsJobsQueryTime == null) return;
     _.each(dsJobs, (x) => {
         if (x.is_active) {
-            let dtnow = new Date();
-            let sec_since = x.timestamp
-            //$('#j24_' + x.id)[0].textContent = 'xxx';
+            let dtdiff_h = moment(new Date()).diff(moment(dsJobsQueryTime)) / 1000 / 60 / 60;
+
+            {
+                let hdiff = x.total_hours + dtdiff_h;
+                let hh = Math.trunc(hdiff);
+                let mdiff = (hdiff - hh) * 60;
+                let mm = Math.trunc(mdiff);
+                let ss =  Math.trunc((mdiff - mm) * 60);
+
+                let hitem = $('#jtot_' + x.id);
+                
+                hitem[0].textContent = hh + ":" + mm; 
+            }
+
+            {
+                let hdiff = x.last_24_hours + dtdiff_h;
+                let hh = Math.trunc(hdiff);
+                let mdiff = (hdiff - hh) * 60;
+                let mm = Math.trunc(mdiff);
+                let ss =  Math.trunc((mdiff - mm) * 60);
+
+                let hitem = $('#j24_' + x.id);
+                
+                hitem[0].textContent = hh + ":" + mm + ":" + ss;
+                hitem.addClass('running-hours');
+            }
         }
     });
 }
@@ -43,6 +68,7 @@ function reloadJobs() {
                 html += '<th scope="col">Action</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
+                dsJobsQueryTime = new Date();
                 dsJobs = _.sortBy(_.sortBy(data.userJobList, (x) => x.name), (x) => !x.is_active);
                 _.each(dsJobs, (x) => {
                     html += '<tr>';
@@ -55,8 +81,8 @@ function reloadJobs() {
                     }
                     else
                         html += '<td>' + x.name + '</td>';
-
-                    html += '<td>' + x.total_hours.toFixed(1) + '</td>';
+                    
+                    html += '<td><span id="jtot_' + x.id + '">' + x.total_hours.toFixed(1) + '</span></td>';
                     html += '<td><span id="j24_' + x.id + '">' + x.last_24_hours.toFixed(1) + '</span></td>';
 
                     html += '<td><a href="#edit" onclick="triggerJob(\'' + x.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a></td>';

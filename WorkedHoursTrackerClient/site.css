@@ -42,3 +42,8 @@ body
 {
     cursor: pointer;    
 }
+
+.running-hours
+{
+    color: red;
+}

@@ -339,10 +339,6 @@ group by id_job
 ) a";
                     var resJobNfo = ctx.ExecSQL<tmptype2>(query).ToDictionary(w => w.id_job, v => v);
 
-                    //query = $"select * from job where id in ({job_ids})";
-
-                    //var jobList = ctx.Jobs.FromSql(query).ToList();                    
-
                     var jobList = ctx.Jobs.AsNoTracking().Where(r => job_ids.Contains(r.id)).ToList();
 
                     foreach (var job in jobList)
@@ -357,10 +353,13 @@ group by id_job
 
                         if (r.is_active)
                         {
-                            r.total_hours = resTotalHours[job.id].GetValueOrDefault();
+                            var working_increment_h = (DateTime.UtcNow - r.trigger_timestamp).TotalHours;
+
+                            r.total_hours = resTotalHours[job.id].GetValueOrDefault() + working_increment_h;
                             double? last24h = null;
                             if (resLast24Hours.TryGetValue(job.id, out last24h))
                                 r.last_24_hours = last24h.GetValueOrDefault();
+                            r.last_24_hours += working_increment_h;
                         }
                         response.userJobList.Add(r);
                     }
