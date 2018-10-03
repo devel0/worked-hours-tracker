@@ -30,7 +30,8 @@ function reloadJobs() {
                 html += '<th scope="col">Action</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
-                _.each(_.sortBy(data.jobList, (x) => x.name), (x) => {
+                let ds = _.sortBy(_.sortBy(data.jobList, (x) => x.name), (x) => !x.is_active);
+                _.each(ds, (x) => {
                     html += '<tr>';
                     if (username == 'admin') {
                         html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.name + '</a></td>';
