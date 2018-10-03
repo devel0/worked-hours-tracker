@@ -26,11 +26,11 @@ namespace WorkedHoursTrackerWebapi
         public double cost_factor { get; set; } = MyDbContext.COST_FACTOR_DEFAULT;
 
         [Required]
-        public int minutes_round { get; set; } = MyDbContext.MINUTES_ROUND_DEFAULT;       
+        public int minutes_round { get; set; } = MyDbContext.MINUTES_ROUND_DEFAULT;
 
         public double Cost(double hours, double hourCost)
         {
-            return Max(base_cost + (hours * 60).MRound(minutes_round) * hourCost * cost_factor, min_cost);
+            return Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost);
         }
 
         [Required]

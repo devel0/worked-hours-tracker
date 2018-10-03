@@ -403,22 +403,107 @@ group by id_job
 
         #region REPORT
 
+        (IXLRange rng_used, int col_cnt, int row_cnt) FinalizeWorksheet(IXLWorksheet ws)
+        {
+            var rng_used = ws.RangeUsed();
+            var col_cnt = rng_used.ColumnCount();
+            var row_cnt = rng_used.RowCount();
+
+            (IXLRange rng_used, int row_cnt, int col_cnt) res = (rng_used, row_cnt, col_cnt);
+
+            ws.Range(1, 1, row_cnt, col_cnt).SetAutoFilter();
+            for (int c = 1; c <= col_cnt; c++) ws.Column(c).AdjustToContents();
+
+            ws.SheetView.Freeze(1, 0);
+
+            return res;
+        }
+
         [HttpGet]
         public async Task<IActionResult> DownloadReport(string username, string password)
         {
-            var pathfilename = "/tmp/test.xlsx";
+            var pathfilename = System.IO.Path.GetTempFileName() + ".xlsx";
 
-            var wb = new XLWorkbook();
-            var ws = wb.AddWorksheet("report");
-            wb.SaveAs(pathfilename);
+            using (var wb = new XLWorkbook())
+            {
+                var ws = wb.AddWorksheet("report");
+
+                var col = 1;
+                var row = 1;
+
+                IXLCell cell = null;
+
+                Action<int, int, object> SetCell = (r, c, v) =>
+                {
+                    cell = ws.Cell(r, c);
+                    cell.Value = v;
+                };
+
+                Action<int, int, object> SetCellBold = (r, c, v) =>
+                {
+                    cell = ws.Cell(r, c);
+                    cell.Value = v;
+                    cell.Style.Font.SetBold();
+                };
+
+                SetCellBold(row, col++, "Job");
+                SetCellBold(row, col++, "Cost(base)");
+                SetCellBold(row, col++, "Cost(min)");
+                SetCellBold(row, col++, "Cost(factor)");
+                SetCellBold(row, col++, "Minutes round");
+
+                SetCellBold(row, col++, "User");
+                SetCellBold(row, col++, "cost/h");
+                SetCellBold(row, col++, "date");
+                SetCellBold(row, col++, "hours");
+                SetCellBold(row, col++, "cost");
+                SetCellBold(row, col++, "notes");
+
+                var users = ctx.Users.ToList();
+                ctx.Jobs.Load();
+
+                foreach (var u in users) // loop over users
+                {
+                    var quserjobs = ctx.UserJobs.Where(r => r.user.id == u.id).OrderBy(w => w.trigger_timestamp).ToList();
+
+                    foreach (var uj in quserjobs) // loop over user jobs
+                    {
+                        if (!uj.is_active)
+                        {
+                            ++row;
+                            col = 1;
+
+                            SetCell(row, col++, uj.job.name);
+                            SetCell(row, col++, uj.job.base_cost);
+                            SetCell(row, col++, uj.job.min_cost);
+                            SetCell(row, col++, uj.job.cost_factor);
+                            SetCell(row, col++, uj.job.minutes_round);
+
+                            SetCell(row, col++, u.username);
+                            SetCell(row, col++, u.cost);
+                            SetCell(row, col++, uj.trigger_timestamp);
+                            SetCell(row, col++, uj.hours_increment);
+                            SetCell(row, col++, uj.job.Cost(uj.hours_increment, u.cost));
+                            //cell = ws.Cell(row,col);
+                            //ws.FormulaR1C1 = "=MIN(RC[-10]+MROUND(RC[-3]*60,RC[-7])/60*RC[-5]*RC[-8],RC[-9])";
+                            SetCell(row, col++, uj.notes);
+                        }
+                    }
+                }
+                FinalizeWorksheet(ws);
+
+                wb.SaveAs(pathfilename);
+            }
 
             var ms = new MemoryStream();
             using (var stream = new FileStream(pathfilename, FileMode.Open))
             {
                 await stream.CopyToAsync(ms);
             }
+            System.IO.File.Delete(pathfilename);
             ms.Position = 0;
             var dtnow = DateTime.Now;
+
             return File(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"wht-{dtnow.Year}-{dtnow.Month}-{dtnow.Day}-report.xlsx");
         }
 
