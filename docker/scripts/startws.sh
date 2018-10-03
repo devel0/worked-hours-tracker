@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /src/workedHoursTrackerClient
+cd /src/WorkedHoursTrackerClient
 ws -p 8000 --spa index.html
