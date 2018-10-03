@@ -6,6 +6,19 @@ $('.js-jobs-btn').click(function (e) {
     reloadJobs();
 });
 
+var dsJobs = null;
+setInterval(timeChecker, 3000);
+
+function timeChecker() {
+    _.each(dsJobs, (x) => {
+        if (x.is_active) {
+            let dtnow = new Date();
+            let sec_since = x.timestamp
+            //$('#j24_' + x.id)[0].textContent = 'xxx';
+        }
+    });
+}
+
 // load jobs list
 function reloadJobs() {
     $.post(urlbase + '/Api/JobList',
@@ -30,21 +43,21 @@ function reloadJobs() {
                 html += '<th scope="col">Action</th>';
                 html += '</tr></thead>';
                 html += '<tbody>';
-                let ds = _.sortBy(_.sortBy(data.jobList, (x) => x.name), (x) => !x.is_active);
-                _.each(ds, (x) => {
+                dsJobs = _.sortBy(_.sortBy(data.userJobList, (x) => x.name), (x) => !x.is_active);
+                _.each(dsJobs, (x) => {
                     html += '<tr>';
                     if (username == 'admin') {
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.name + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.base_cost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.min_cost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.cost_factor + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.minutes_round + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.job.name + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.job.base_cost + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.job.min_cost + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.job.cost_factor + '</a></td>';
+                        html += '<td><a href="#edit" onclick="openJob(\'' + x.id + '\');">' + x.job.minutes_round + '</a></td>';
                     }
                     else
                         html += '<td>' + x.name + '</td>';
 
                     html += '<td>' + x.total_hours.toFixed(1) + '</td>';
-                    html += '<td>' + x.last_24_hours.toFixed(1) + '</td>';
+                    html += '<td><span id="j24_' + x.id + '">' + x.last_24_hours.toFixed(1) + '</span></td>';
 
                     html += '<td><a href="#edit" onclick="triggerJob(\'' + x.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a></td>';
 
@@ -127,11 +140,11 @@ function triggerJob(id) {
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
-            if (checkApiSuccessful(data)) {                
+            if (checkApiSuccessful(data)) {
                 reloadJobs();
             } else {
                 $.notify('invalid login', 'error');
-                gotoState('login');                
+                gotoState('login');
             }
         });
 }

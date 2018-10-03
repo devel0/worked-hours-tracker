@@ -282,6 +282,13 @@ namespace WorkedHoursTrackerWebapi.Controllers
             public double? hours_sum;
         }
 
+        public class tmptype2
+        {
+            public long id_job;
+            public bool is_active;
+            public DateTime trigger_timestamp;
+        }
+
         [HttpPost]
         public CommonResponse JobList(string username, string password, string filter)
         {
@@ -313,44 +320,62 @@ group by uj.id_job";
                     var resLast24Hours = ctx.ExecSQL<tmptype>(query).ToDictionary(w => w.id_job, w => w.hours_sum);
 
                     // build job_ids
-                    var job_ids = string.Join(',', resTotalHours.Select(w => w.Key.ToString()));
+                    var job_ids = resTotalHours.Select(w => w.Key).ToArray();
+                    var job_ids_str = string.Join(',', job_ids.Select(w => w.ToString()));
 
                     // retrieve is_active
                     query = $@"
-select a.id_job from
+select a.id_job, a.is_active, a.trigger_timestamp from
 (
-select uj.id_job, first(uj.is_active order by uj.trigger_timestamp desc) is_active from userjob uj
-where uj.id_user={user.id} and uj.id_job in ({job_ids})
+select
+    uj.id_job,
+    first(uj.is_active order by uj.trigger_timestamp desc) is_active,
+    first(uj.trigger_timestamp order by uj.trigger_timestamp desc) trigger_timestamp
+from
+    userjob uj
+where
+    uj.id_user={user.id} and uj.id_job in ({job_ids_str})
 group by id_job
-) a where a.is_active";
-                    var resActiveJobs = ctx.ExecSQL<long>(query).ToHashSet();
+) a";
+                    var resJobNfo = ctx.ExecSQL<tmptype2>(query).ToDictionary(w => w.id_job, v => v);
 
-                    query = $"select * from job where id in ({job_ids})";
+                    //query = $"select * from job where id in ({job_ids})";
 
-                    response.jobList = ctx.Jobs.AsNoTracking().FromSql(query).ToList();
+                    //var jobList = ctx.Jobs.FromSql(query).ToList();                    
 
-                    foreach (var x in response.jobList)
+                    var jobList = ctx.Jobs.AsNoTracking().Where(r => job_ids.Contains(r.id)).ToList();
+
+                    foreach (var job in jobList)
                     {
-                        x.total_hours = resTotalHours[x.id].GetValueOrDefault();
-                        double? last24h = null;
-                        if (resLast24Hours.TryGetValue(x.id, out last24h))
-                            x.last_24_hours = last24h.GetValueOrDefault();
-                        x.is_active = resActiveJobs.Contains(x.id);
+                        var jnfo = resJobNfo[job.id];
+                        var r = new UserJobNfo()
+                        {
+                            job = job,
+                            is_active = jnfo.is_active,
+                            trigger_timestamp = jnfo.trigger_timestamp
+                        };
+
+                        if (r.is_active)
+                        {
+                            r.total_hours = resTotalHours[job.id].GetValueOrDefault();
+                            double? last24h = null;
+                            if (resLast24Hours.TryGetValue(job.id, out last24h))
+                                r.last_24_hours = last24h.GetValueOrDefault();
+                        }
+                        response.userJobList.Add(r);
                     }
 
                     if (username != "admin")
                     {
-                        foreach (var x in response.jobList)
+                        foreach (var x in response.userJobList)
                         {
-                            x.base_cost = 0;
-                            x.min_cost = 0;
-                            x.cost_factor = 0;
-                            x.minutes_round = 0;
+                            x.job.base_cost = 0;
+                            x.job.min_cost = 0;
+                            x.job.cost_factor = 0;
+                            x.job.minutes_round = 0;
                         }
                     }
                 }
-                else
-                    response.jobList = new List<Job>();
 
                 return response;
             }

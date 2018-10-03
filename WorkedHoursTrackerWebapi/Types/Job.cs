@@ -26,16 +26,7 @@ namespace WorkedHoursTrackerWebapi
         public double cost_factor { get; set; } = MyDbContext.COST_FACTOR_DEFAULT;
 
         [Required]
-        public int minutes_round { get; set; } = MyDbContext.MINUTES_ROUND_DEFAULT;
-
-        [NotMapped]
-        public bool is_active { get; set; }
-
-        [NotMapped]
-        public double total_hours { get; set; }
-
-        [NotMapped]
-        public double last_24_hours { get; set; }
+        public int minutes_round { get; set; } = MyDbContext.MINUTES_ROUND_DEFAULT;       
 
         public double Cost(double hours, double hourCost)
         {

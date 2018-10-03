@@ -6,7 +6,7 @@ namespace WorkedHoursTrackerWebapi
     public class JobListResponse : CommonResponse
     {
 
-        public List<Job> jobList { get; set; }
+        public List<UserJobNfo> userJobList { get; set; } = new List<UserJobNfo>();
 
     }
 
