@@ -331,3 +331,4 @@ ASALocalRun/
 
 bower_components/
 WorkedHoursTrackerWebapi/Migrations/
+docker/clone

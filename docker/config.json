@@ -1,0 +1,7 @@
+{
+  "DBHostname": "dkpostgres.searchathing.com",
+  "DBPort": 5432,
+  "DBName": "worked_hours_tracker",
+  "DBUsername": "postgres",
+  "DBPassword": "dbpass"
+}
