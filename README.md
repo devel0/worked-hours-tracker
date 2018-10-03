@@ -35,29 +35,29 @@ file appears like follow
 
 **User view**
 
-[img](doc/Selection_095.png)
+![img](doc/Selection_095.png)
 
 **User edit**
 
-[img](doc/Selection_096.png)
+![img](doc/Selection_096.png)
 
 **Job list**
 
-[img](doc/Selection_097.png)
+![img](doc/Selection_097.png)
 
 **Worked hours report**
 
-[img](doc/Selection_099.png)
+![img](doc/Selection_099.png)
 
 ### all users
 
 **Job list**
 
-[img](doc/Selection_100.png)
+![img](doc/Selection_100.png)
 
 **Job work notes**
 
-[img](doc/Selection_101.png)
+![img](doc/Selection_101.png)
 
 ## how this project was created
 
