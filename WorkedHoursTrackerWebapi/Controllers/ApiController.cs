@@ -103,8 +103,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                     if (jUser.username == "admin") throw new Exception($"cannot create builtin admin account");
 
                     user = new User()
-                    {
-                        username = jUser.username,
+                    {                        
                         create_timestamp = DateTime.UtcNow
                     };
 
@@ -114,9 +113,10 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 {
                     user = ctx.Users.FirstOrDefault(w => w.id == jUser.id);
                     if (user == null) throw new Exception($"unable to find [{jUser.id}] entry");
-
+                
                     user.modify_timestamp = DateTime.UtcNow;
                 }
+                user.username = jUser.username;
                 user.password = jUser.password?.Trim();
                 user.cost = jUser.cost;
 
