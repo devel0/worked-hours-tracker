@@ -53,7 +53,7 @@ namespace WorkedHoursTrackerWebapi
                 // check mode 600
                 if (!LinuxHelper.IsFilePermissionSafe(AppConfigPathfilename, 384))
                 {
-                    throw new Exception($"invalid file permission [{AppConfigPathfilename}] must set to 700");
+                    throw new Exception($"invalid file permission [{AppConfigPathfilename}] must set to 600");
                 }
 
                 var attrs = File.GetAttributes(AppConfigPathfilename);
