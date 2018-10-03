@@ -422,6 +422,8 @@ group by id_job
         [HttpGet]
         public async Task<IActionResult> DownloadReport(string username, string password)
         {
+            if (username != "admin" || !CheckAuth(username, password)) return null;
+
             var pathfilename = System.IO.Path.GetTempFileName() + ".xlsx";
 
             using (var wb = new XLWorkbook())
