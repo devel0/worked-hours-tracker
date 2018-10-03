@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using SearchAThing.Util;
 using SearchAThing.EFUtil;
 using SearchAThing.PsqlUtil;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace WorkedHoursTrackerWebapi.Controllers
 {
@@ -398,6 +400,29 @@ group by id_job
         #endregion
 
         #region USER JOB        
+
+        #region REPORT
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadReport(string username, string password)
+        {
+            var pathfilename = "/tmp/test.xlsx";
+
+            var wb = new XLWorkbook();
+            var ws = wb.AddWorksheet("report");
+            wb.SaveAs(pathfilename);
+
+            var ms = new MemoryStream();
+            using (var stream = new FileStream(pathfilename, FileMode.Open))
+            {
+                await stream.CopyToAsync(ms);
+            }
+            ms.Position = 0;
+            var dtnow = DateTime.Now;
+            return File(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"wht-{dtnow.Year}-{dtnow.Month}-{dtnow.Day}-report.xlsx");
+        }
+
+        #endregion
 
         [HttpPost]
         public CommonResponse TriggerJob(string username, string password, int id_job)

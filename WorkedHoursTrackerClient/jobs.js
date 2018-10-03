@@ -227,8 +227,7 @@ $('.js-job-delete-btn').click(function (e) {
 
 // edit job notes
 function editJobNotes(id) {
-    if (loadJobNote(id))
-        gotoState('job-edit-note');
+    loadJobNote(id);        
 }
 
 // close job

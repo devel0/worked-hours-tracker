@@ -49,12 +49,6 @@ function gotoState(newstate) {
             }
             break;
 
-        case 'report':
-            {
-                showInnerPart('.js-main', '.js-main-report');
-            }
-            break;
-
     }
 }
 
