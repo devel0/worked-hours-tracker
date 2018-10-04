@@ -5,7 +5,8 @@ web tracker of worked hours
 ## features
 
 - admin access to create user, edit contacts, set user work cost, download report
-- user access to toggle work, download report own hours
+- user access to toggle work
+- notes can be inserted when job toggled on and will reported in the report
 
 ## install (docker)
 
@@ -24,7 +25,7 @@ cd docker
 
 - configure nginx [example](https://github.com/devel0/knowledge/blob/master/webdevel/nginx-webapi-conf.md)
 
-## install (development)
+## development
 
 - first run generate follow error message
 
@@ -71,6 +72,14 @@ dotnet ef database update
 ![img](doc/Selection_097.png)
 
 **Worked hours report**
+
+- worked hour cost computed by Cost() function of [Job](WorkedHoursTrackerWebapi/Types/Job.cs) as follow
+
+```
+Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost)
+```
+
+written into xlsx as formula
 
 ![img](doc/Selection_099.png)
 
