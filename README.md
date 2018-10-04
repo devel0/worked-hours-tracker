@@ -7,7 +7,24 @@ web tracker of worked hours
 - admin access to create user, edit contacts, set user work cost, download report
 - user access to toggle work, download report own hours
 
-## install
+## install (docker)
+
+- tune `docker/config.json` for an existing db connection name ( just create an empty database in some postgres server db )
+
+```sh
+cd docker
+./build.sh
+```
+
+- if default docker network restricted ( 80, 443 are used to install bower and nuget packages ) run `./build --network=build` where `build` is a network without specific outgoing restrictions
+
+```sh
+./run.sh
+```
+
+- configure nginx [example](https://github.com/devel0/knowledge/blob/master/webdevel/nginx-webapi-conf.md)
+
+## install (development)
 
 - first run generate follow error message
 
