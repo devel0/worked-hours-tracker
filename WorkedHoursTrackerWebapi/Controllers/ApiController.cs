@@ -485,9 +485,10 @@ group by id_job
                             SetCell(row, col++, u.cost);
                             SetCell(row, col++, uj.trigger_timestamp);
                             SetCell(row, col++, uj.hours_increment);
-                            SetCell(row, col++, uj.job.Cost(uj.hours_increment, u.cost));
-                            //cell = ws.Cell(row,col);
-                            //ws.FormulaR1C1 = "=MIN(RC[-10]+MROUND(RC[-3]*60,RC[-7])/60*RC[-5]*RC[-8],RC[-9])";
+                            //SetCell(row, col++, uj.job.Cost(uj.hours_increment, u.cost));
+                            // Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost);
+                            cell = ws.Cell(row,col++);                            
+                            cell.FormulaR1C1 = "=MAX(RC[-8]+MROUND(RC[-1]*60,RC[-5])/60*RC[-3]*RC[-6],RC[-7])";
                             SetCell(row, col++, uj.notes);
                         }
                     }
