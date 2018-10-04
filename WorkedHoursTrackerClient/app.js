@@ -1,6 +1,8 @@
 //urlbase = 'http://localhost:5000'; // set to external url from entrypoint
 urlbase = window.location.protocol + '//' + window.location.hostname;
+
 debugmode = true; // set to false from entrypoint
+if (debugmode) urlbase += ":5000";
 
 username = '';
 password = '';
@@ -15,6 +17,23 @@ let credshortlistdata = null;
 let state = '';
 
 let filterTimer = null;
+
+/**
+ * 
+ * @param apiurl example: /api/UserList
+ * @param data example: { username: 'xxx' }
+ * @param success example: function (data) { }
+ */
+function post(apiurl,data,success)
+{
+    $.ajax({
+        method: 'POST',
+        url: urlbase + apiurl,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: success
+    });
+}
 
 window.onpopstate = function (e) {
     let loc = new this.URL(document.location);
@@ -51,10 +70,15 @@ $('.js-logout-btn').click(function (e) {
 })
 
 // check if login required
-$.post(
-    urlbase + '/Api/IsAuthValid',
-    { username: username, password: password },
-    function (data, status, jqXHR) {
+$.ajax({
+    method: 'POST',
+    url: urlbase + '/api/IsAuthValid',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({
+        username: username,
+        password: password
+    }),
+    success: function (data) {
         if (checkApiError(data)) return;
         if (checkApiInvalidAuth(data))
             gotoState('login');
@@ -62,4 +86,4 @@ $.post(
             gotoState('main');
         }
     }
-);
+});

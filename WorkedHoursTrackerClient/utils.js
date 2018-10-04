@@ -45,7 +45,7 @@ function gotoState(newstate) {
 
         case 'job-edit-note':
             {
-                showInnerPart('.js-main', '.js-main-job-edit-note');                
+                showInnerPart('.js-main', '.js-main-job-edit-note');
             }
             break;
 
@@ -90,12 +90,15 @@ function checkApiInvalidAuth(data) {
 }
 
 function checkLogin() {
-    $.post(urlbase + '/Api/IsAuthValid',
-        {
+    $.ajax({
+        method: 'POST',
+        url: urlbase + '/api/IsAuthValid',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({
             username: username,
             password: password
-        },
-        function (data, status, jqXHR) {
+        }),
+        success: function (data) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 $.notify('logged in', 'success');
@@ -104,5 +107,6 @@ function checkLogin() {
             } else {
                 $.notify('invalid login', 'error');
             }
-        });
+        }
+    });
 }
