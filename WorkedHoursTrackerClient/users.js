@@ -8,10 +8,12 @@ $('.js-users-btn').click(function (e) {
 
 // load user list
 function reloadUsers() {
-    post(
-        '/api/UserList',
-        { username: username, password: password },
-        function (data) {
+    $.post(urlbase + '/Api/UserList',
+        {
+            username: username,
+            password: password
+        },
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 let html = '<table class="table table-striped">';
@@ -40,7 +42,7 @@ function clearUserEdit() {
     $('#user-edit-id')[0].value = '0';
     $('#user-edit-username-box')[0].value = '';
     $('#user-edit-password-box')[0].value = '';
-    $('#user-edit-cost-box')[0].value = '0';
+    $('#user-edit-cost-box')[0].value = '0';    
 }
 
 function buildUserEditObj() {
@@ -68,14 +70,13 @@ $('.js-user-new-btn').click(function (e) {
 
 // edit user
 function openUser(id) {
-    post(
-        '/api/LoadUser',
+    $.post(urlbase + '/Api/LoadUser',
         {
             username: username,
             password: password,
             id: id
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 $('#user-edit-username-box')[0].value = data.user.username;
@@ -100,14 +101,14 @@ $('.js-user-save-btn').click(function (e) {
         return;
     }
 
-    post(
-        '/api/SaveUser',
+    $.post(
+        urlbase + '/Api/SaveUser',
         {
             username: username,
             password: password,
             jUser: buildUserEditObj()
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiInvalidAuth(data)) showPart('.js-login');
             else {
@@ -123,14 +124,14 @@ $('.js-user-save-btn').click(function (e) {
 // remove user
 $('.js-user-delete-btn').click(function (e) {
     if (confirm('sure to delete ?')) {
-        post(
-            '/api/DeleteUser',
+        $.post(
+            urlbase + '/Api/DeleteUser',
             {
                 username: username,
                 password: password,
                 id: $('#user-edit-id')[0].value
             },
-            function (data) {
+            function (data, status, jqXHR) {
                 if (checkApiError(data)) return;
                 if (checkApiInvalidAuth(data)) showPart('.js-login');
                 else {

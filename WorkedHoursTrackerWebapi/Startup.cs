@@ -51,11 +51,7 @@ namespace WorkedHoursTrackerWebapi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseCors(builder => {
-                    builder.WithOrigins("*");
-                    builder.WithMethods("*");
-                    builder.WithHeaders("*");
-                });
+                app.UseCors(builder => builder.WithOrigins("*"));
             }
 
             // CUSTOM EXCEPTION HANDLER

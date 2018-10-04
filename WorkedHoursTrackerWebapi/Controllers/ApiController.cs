@@ -11,14 +11,12 @@ using SearchAThing.EFUtil;
 using SearchAThing.PsqlUtil;
 using ClosedXML.Excel;
 using System.IO;
-using Newtonsoft.Json.Linq;
 
 namespace WorkedHoursTrackerWebapi.Controllers
 {
 
-    [Route("api/[action]")]
-    [ApiController]
-    public class MainController : ControllerBase
+    [Route("[controller]/[action]")]
+    public class ApiController : Controller
     {
 
         private readonly IGlobal global;
@@ -27,7 +25,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         private readonly MyDbContext ctx;
 
         #region constructor
-        public MainController(MyDbContext ctx, ILogger<MainController> logger)
+        public ApiController(MyDbContext ctx, ILogger<ApiController> logger)
         {
             this.logger = logger;
             this.ctx = ctx;
@@ -70,16 +68,6 @@ namespace WorkedHoursTrackerWebapi.Controllers
             };
         }
 
-        bool CheckAuth(JToken req)
-        {
-            return CheckAuth(req.Value<string>("username"), req.Value<string>("password"));
-        }
-
-        bool CheckAdminAuth(JToken req)
-        {
-            return req.Value<string>("username") == "admin" && CheckAuth(req);
-        }
-
         bool CheckAuth(string username, string password)
         {
             var qdb = ctx.Users.FirstOrDefault(w => w.username == username);
@@ -103,14 +91,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
         #region USERS
 
         [HttpPost]
-        public CommonResponse SaveUser([FromBody]JToken req)
+        public CommonResponse SaveUser(string username, string password, User jUser)
         {
             try
             {
-                var jUser = req["jUser"].ToObject<User>();
-
                 // disallow non admin
-                if (jUser == null || !CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (jUser == null || username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 User user = null;
 
@@ -147,14 +133,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadUser([FromBody]JToken req)
+        public CommonResponse LoadUser(string username, string password, int id)
         {
             try
             {
-                var id = (long)req["id"];
-
                 // disallow non admin
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new UserResponse();
 
@@ -169,14 +153,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteUser([FromBody]JToken req)
+        public CommonResponse DeleteUser(string username, string password, int id)
         {
             try
             {
-                var id = req.Value<long>("id");
-
                 // disallow non admin
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var q = ctx.Users.FirstOrDefault(w => w.id == id);
                 if (q != null)
@@ -194,14 +176,12 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse UserList([FromBody]JToken req)
+        public CommonResponse UserList(string username, string password, string filter)
         {
             try
             {
                 // disallow non admin
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
-
-                var filter = req.Value<string>("filter");
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new UserListResponse();
 
@@ -220,13 +200,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
         #region JOBS
 
         [HttpPost]
-        public CommonResponse SaveJob([FromBody]JToken req)
+        public CommonResponse SaveJob(string username, string password, Job jJob)
         {
             try
             {
-                var jJob = req["jJob"].ToObject<Job>();
-
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 Job job = null;
                 if (jJob.id == 0)
@@ -259,13 +237,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse LoadJob([FromBody]JToken req)
+        public CommonResponse LoadJob(string username, string password, int id_job)
         {
             try
             {
-                var id_job = req.Value<long>("id_job");
-
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new ContactInfoResponse();
 
@@ -280,13 +256,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse DeleteJob([FromBody]JToken req)
+        public CommonResponse DeleteJob(string username, string password, int id_job)
         {
             try
             {
-                var id_job = req.Value<long>("id_job");
-
-                if (!CheckAdminAuth(req)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var q = ctx.Jobs.FirstOrDefault(w => w.id == id_job);
 
@@ -318,14 +292,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
         }
 
         [HttpPost]
-        public CommonResponse JobList([FromBody]JToken req)
+        public CommonResponse JobList(string username, string password, string filter)
         {
             try
             {
-                var filter = req.Value<string>("filter");
-                var username = req.Value<string>("username");
-
-                if (!CheckAuth(req)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var response = new JobListResponse();
 
@@ -541,14 +512,11 @@ group by id_job
         #endregion
 
         [HttpPost]
-        public CommonResponse TriggerJob(JToken req)
+        public CommonResponse TriggerJob(string username, string password, int id_job)
         {
             try
             {
-                var id_job = req.Value<long>("id_job");
-                var username = req.Value<string>("username");
-
-                if (!CheckAuth(req)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -598,14 +566,11 @@ group by id_job
         }
 
         [HttpPost]
-        public CommonResponse GetJobNotes(JToken req)
+        public CommonResponse GetJobNotes(string username, string password, int id_job)
         {
             try
             {
-                var id_job = req.Value<long>("id_job");
-                var username = req.Value<string>("username");
-
-                if (!CheckAuth(req)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -630,15 +595,11 @@ group by id_job
 
 
         [HttpPost]
-        public CommonResponse SaveJobNotes([FromBody] JToken req)
+        public CommonResponse SaveJobNotes(string username, string password, int id_job, string notes)
         {
             try
             {
-                var id_job = req.Value<long>("id_job");
-                var notes = req.Value<string>("notes");
-                var username = req.Value<string>("username");
-
-                if (!CheckAuth(req)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -662,11 +623,11 @@ group by id_job
         #endregion
 
         [HttpPost]
-        public CommonResponse IsAuthValid([FromBody]JToken req)
+        public CommonResponse IsAuthValid(string username, string password)
         {
             try
             {
-                if (!CheckAuth(req)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password)) return InvalidAuthResponse();
                 return SuccessfulResponse();
             }
             catch (Exception ex)

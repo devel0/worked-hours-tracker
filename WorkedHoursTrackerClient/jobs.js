@@ -46,12 +46,12 @@ function timeChecker() {
 
 // load jobs list
 function reloadJobs() {
-    post('/api/JobList',
+    $.post(urlbase + '/Api/JobList',
         {
             username: username,
             password: password
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 let html = '<table class="table table-striped">';
@@ -83,10 +83,9 @@ function reloadJobs() {
                     html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
                     html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
 
-                    let s = '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a>';
-                    if (x.is_active) s += ' - <a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>';
-                    s += '</td>';
-                    html += s;
+                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a> - ' +
+                        '<a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>'
+                    '</td>';
 
                     html += '</tr>';
                 });
@@ -131,13 +130,13 @@ $('.js-job-new-btn').click(function (e) {
 
 // edit job
 function openJob(id) {
-    post('/api/LoadJob',
+    $.post(urlbase + '/Api/LoadJob',
         {
             username: username,
             password: password,
             id_job: id
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 $('#job-edit-name-box')[0].value = data.job.name;
@@ -159,13 +158,13 @@ function openJob(id) {
 
 // trigger job
 function triggerJob(id) {
-    post('/api/TriggerJob',
+    $.post(urlbase + '/Api/TriggerJob',
         {
             username: username,
             password: password,
             id_job: id
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiSuccessful(data)) {
                 reloadJobs();
@@ -183,14 +182,14 @@ $('.js-job-save-btn').click(function (e) {
         return;
     }
 
-    post(
-        '/api/SaveJob',
+    $.post(
+        urlbase + '/Api/SaveJob',
         {
             username: username,
             password: password,
             jJob: buildJobEditObj()
         },
-        function (data) {
+        function (data, status, jqXHR) {
             if (checkApiError(data)) return;
             if (checkApiInvalidAuth(data)) showPart('.js-login');
             else {
@@ -206,14 +205,14 @@ $('.js-job-save-btn').click(function (e) {
 // remove job
 $('.js-job-delete-btn').click(function (e) {
     if (confirm('sure to delete ?')) {
-        post(
-            '/api/DeleteJob',
+        $.post(
+            urlbase + '/Api/DeleteJob',
             {
                 username: username,
                 password: password,
                 id_job: $('#job-edit-id')[0].value
             },
-            function (data) {
+            function (data, status, jqXHR) {
                 if (checkApiError(data)) return;
                 if (checkApiInvalidAuth(data)) showPart('.js-login');
                 else {
@@ -228,7 +227,7 @@ $('.js-job-delete-btn').click(function (e) {
 
 // edit job notes
 function editJobNotes(id) {
-    loadJobNote(id);
+    loadJobNote(id);        
 }
 
 // close job
