@@ -4,9 +4,30 @@ web tracker of worked hours
 
 ## features
 
-- admin access to create user, edit contacts, set user work cost, download report
-- user access to toggle work
-- notes can be inserted when job toggled on and will reported in the report
+- admin
+  - create user
+  - edit job
+  - download report
+- user
+  - toggle work
+  - notes can be inserted when job toggled on and will reported in the report
+- [user](WorkedHoursTrackerWebapi/Types/User.cs) properties
+  - cost ( hour cost )
+- [job](WorkedHoursTrackerWebapi/Types/Job.cs) properties
+  - base_cost
+  - min_cost
+  - cost_factor
+  - minutes_round
+  
+- work cost computed by Cost() function of [Job](WorkedHoursTrackerWebapi/Types/Job.cs), written into xlsx as formula, as follow
+
+```
+Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost)
+```
+
+## roadmap (TODO)
+
+- pause/resume function ( to avoid a base_cost if deactivate/activate again )
 
 ## install (docker)
 
@@ -72,14 +93,6 @@ dotnet ef database update
 ![img](doc/Selection_097.png)
 
 **Worked hours report**
-
-- worked hour cost computed by Cost() function of [Job](WorkedHoursTrackerWebapi/Types/Job.cs) as follow
-
-```
-Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost)
-```
-
-written into xlsx as formula
 
 ![img](doc/Selection_099.png)
 
