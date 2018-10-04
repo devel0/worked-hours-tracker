@@ -1,6 +1,6 @@
-//urlbase = 'http://localhost:5000'; // set to external url from entrypoint
 urlbase = window.location.protocol + '//' + window.location.hostname;
 debugmode = true; // set to false from entrypoint
+if (debugmode) urlbase += ":5000";
 
 username = '';
 password = '';
