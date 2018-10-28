@@ -8,7 +8,7 @@ namespace WorkedHoursTrackerWebapi
 {
 
     [Table("activity")]
-    public class activity
+    public class Activity
     {
         [Key]
         public long id { get; set; }

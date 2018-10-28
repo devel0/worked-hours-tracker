@@ -203,6 +203,105 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
         #endregion
 
+        #region ACTIVITIES
+
+        [HttpPost]
+        public CommonResponse SaveActivity(string username, string password, Activity jActivity)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditActivities) return InvalidAuthResponse();
+
+                Activity activity = null;
+                if (jActivity.id == 0)
+                {
+                    activity = new Activity();
+
+                    ctx.Activities.Add(activity);
+                }
+                else
+                {
+                    activity = ctx.Activities.FirstOrDefault(w => w.id == jActivity.id);
+                    if (activity == null) throw new Exception($"unable to find [{jActivity.id}] entry");
+                }
+                activity.name = jActivity.name.Trim();
+                activity.description = jActivity.description;
+                ctx.SaveChanges();
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse LoadActivity(string username, string password, int id_activity)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditActivities) return InvalidAuthResponse();
+
+                var response = new ActivityInfoResponse();
+
+                response.Activity = ctx.Activities.FirstOrDefault(w => w.id == id_activity);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse DeleteActivity(string username, string password, int id_activity)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditActivities) return InvalidAuthResponse();
+
+                var q = ctx.Activities.FirstOrDefault(w => w.id == id_activity);
+
+                if (q != null)
+                {
+                    ctx.Activities.Remove(q);
+                    ctx.SaveChanges();
+                }
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse ActivityList(string username, string password, string filter)
+        {
+            try
+            {
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
+
+                var response = new ActivityListResponse();
+
+                response.activityList = ctx.Activities.ToList();                 
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex.Message);
+            }
+        }
+
+        #endregion       
+
         #region JOBS
 
         [HttpPost]

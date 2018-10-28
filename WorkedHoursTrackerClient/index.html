@@ -47,10 +47,12 @@
         <div class="col-auto">
           <button type="button" class="btn btn-primary js-users-btn js-admin-fn">
             <i class="fas fa-users"></i> Users</button>
+          <button type="button" class="btn btn-primary js-activities-btn ml-1">
+            <i class="fas fa-tasks"></i> Activities</button>
           <button type="button" class="btn btn-primary js-jobs-btn ml-1">
             <i class="fas fa-address-card"></i> Jobs</button>
           <button type="button" class="btn btn-primary js-report-btn js-admin-fn ml-1">
-            <i class="fas fa-file-excel"></i> Report</button>            
+            <i class="fas fa-file-excel"></i> Report</button>
         </div>
       </div>
 
@@ -152,6 +154,71 @@
       </div>
 
       <!------------------------------------------------------------------------------------->
+      <!-- ACTIVITIES -->
+      <!------------------------------------------------------------------------------------->
+      <div class="row js-main-activities js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Activities</h2>
+
+          <div class="row">
+            <div class="col-auto">
+              <button type="button" class="btn btn-success js-activity-new-btn">Create</button>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col">
+              <div id="activities-tbl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row js-main-activity-edit js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Activity edit</h2>
+
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-success js-activity-save-btn">
+                <i class="fas fa-save"></i> Save changes</button>
+              <button type="button" class="btn btn-danger js-activity-delete-btn">
+                <i class="fas fa-trash"></i> Remove</button>
+              <button type="button" class="btn btn-light js-activity-discard-btn">
+                <i class="fas fa-times"></i> Close</button>
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="activity-edit-name-box">
+                <b>Name</b>
+            </div>
+            <div class="col">
+              <input type="hidden" id="activity-edit-id" />
+              <input type="text" class="form-control" id="activity-edit-name-box" />
+            </div>
+          </div>           
+
+          <!-- Description -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="activity-edit-description-box">
+                <b>Description</b>
+            </div>
+            <div class="col">
+              <input type="hidden" id="activity-edit-id" />
+              <input type="text" class="form-control" id="activity-edit-description-box" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!------------------------------------------------------------------------------------->
       <!-- JOBS -->
       <!------------------------------------------------------------------------------------->
       <div class="row js-main-jobs js-inner-part collapse">
@@ -219,7 +286,7 @@
                 <b>Cost (min)</b>
             </div>
             <div class="col">
-              <input type="text" class="form-control" id="job-edit-mincost-box" value="0"/>
+              <input type="text" class="form-control" id="job-edit-mincost-box" value="0" />
             </div>
           </div>
 
@@ -241,7 +308,7 @@
                 <b>Minutes round</b>
             </div>
             <div class="col">
-              <input type="text" class="form-control" id="job-edit-minutesround-box" value="1"/>
+              <input type="text" class="form-control" id="job-edit-minutesround-box" value="1" />
             </div>
           </div>
 
@@ -257,7 +324,7 @@
           <div class="row">
             <div class="col">
               <button type="button" class="btn btn-success js-job-note-save-btn">
-                <i class="fas fa-save"></i> Save changes</button>              
+                <i class="fas fa-save"></i> Save changes</button>
               <button type="button" class="btn btn-light js-job-note-discard-btn">
                 <i class="fas fa-times"></i> Close</button>
             </div>
@@ -272,23 +339,23 @@
             <div class="col">
               <span class="form-control" id="job-edit-note-name-box"></span>
             </div>
-          </div>           
+          </div>
 
           <!-- Notes -->
           <div class="row mt-3">
-              <div class="col-2 text-right">
-                <label for="job-edit-note-notes-box">
-                  <b>Notes</b>
-              </div>
-              <div class="col editor">
-                <textarea class="form-control" id="job-edit-note-notes-box" rows="10" placeholder="Write notes here"></textarea>
-              </div>
-            </div>           
+            <div class="col-2 text-right">
+              <label for="job-edit-note-notes-box">
+                <b>Notes</b>
+            </div>
+            <div class="col editor">
+              <textarea class="form-control" id="job-edit-note-notes-box" rows="10" placeholder="Write notes here"></textarea>
+            </div>
+          </div>
 
 
         </div>
       </div>
-      
+
     </div>
 
     <!-- js-login -->
@@ -350,6 +417,7 @@
   <!-- app -->
   <script src="app.js"></script>
   <script src="users.js"></script>
+  <script src="activities.js"></script>
   <script src="jobs.js"></script>
   <script src="jobnote.js"></script>
   <script src="report.js"></script>

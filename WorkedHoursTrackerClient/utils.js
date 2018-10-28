@@ -31,6 +31,18 @@ function gotoState(newstate) {
             }
             break;
 
+        case 'activities':
+            {
+                showInnerPart('.js-main', '.js-main-activities');
+            }
+            break;
+
+        case 'activity-edit':
+            {
+                showInnerPart('.js-main', '.js-main-activity-edit');
+            }
+            break;
+
         case 'jobs':
             {
                 showInnerPart('.js-main', '.js-main-jobs');
