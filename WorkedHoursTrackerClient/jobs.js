@@ -46,56 +46,82 @@ function timeChecker() {
 
 // load jobs list
 function reloadJobs() {
-    $.post(urlbase + '/Api/JobList',
+    $.post(urlbase + '/Api/ActivityList',
         {
             username: username,
             password: password
         },
-        function (data, status, jqXHR) {
-            if (checkApiError(data)) return;
-            if (checkApiSuccessful(data)) {
-                let html = '<table class="table table-striped">';
-                html += '<thead><tr>';
-                html += '<th scope="col">Name</th>';
-                if (username == 'admin') {
-                    html += '<th scope="col">Cost (base)</th>';
-                    html += '<th scope="col">Cost (min)</th>';
-                    html += '<th scope="col">Cost (factor)</th>';
-                    html += '<th scope="col">Minutes round</th>';
-                }
-                html += '<th scope="col">Total (hr)</th>';
-                html += '<th scope="col">Last24 (hr)</th>';
-                html += '<th scope="col">Action</th>';
-                html += '</tr></thead>';
-                html += '<tbody>';
-                dsJobsQueryTime = new Date();
-                dsJobs = _.sortBy(_.sortBy(data.userJobList, (x) => x.name), (x) => !x.is_active);
-                _.each(dsJobs, (x) => {
-                    html += '<tr>';
-                    html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.name + '</a></td>';
-                    if (username == 'admin') {
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.base_cost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.min_cost + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.cost_factor + '</a></td>';
-                        html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.minutes_round + '</a></td>';
+        function (data1, status1, jqXHR1) {
+            activities = data1.activityList;
+
+            $.post(urlbase + '/Api/JobList',
+                {
+                    username: username,
+                    password: password
+                },
+                function (data, status, jqXHR) {
+                    if (checkApiError(data)) return;
+                    if (checkApiSuccessful(data)) {
+                        let html = '';
+
+                        html += '<datalist id="actions">';                        
+                        _.each(activities, (act) => {
+                            html += '<option value="' + act.name + '" title="' + act.description +'">' + act.name + '</option>';
+                        });                        
+                        html += '</datalist>';
+
+                        html += '<table class="table table-striped">';
+                        html += '<thead><tr>';
+                        html += '<th scope="col">Name</th>';
+                        if (username == 'admin') {
+                            html += '<th scope="col">Cost (base)</th>';
+                            html += '<th scope="col">Cost (min)</th>';
+                            html += '<th scope="col">Cost (factor)</th>';
+                            html += '<th scope="col">Minutes round</th>';
+                        }
+                        html += '<th scope="col">Total (hr)</th>';
+                        html += '<th scope="col">Last24 (hr)</th>';
+                        html += '<th scope="col">Activity</th>';
+                        html += '<th scope="col">Action</th>';
+                        html += '</tr></thead>';
+                        html += '<tbody>';
+                        dsJobsQueryTime = new Date();
+                        dsJobs = _.sortBy(_.sortBy(data.userJobList, (x) => x.name), (x) => !x.is_active);
+                        _.each(dsJobs, (x) => {
+                            html += '<tr>';
+                            html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.name + '</a></td>';
+                            if (username == 'admin') {
+                                html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.base_cost + '</a></td>';
+                                html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.min_cost + '</a></td>';
+                                html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.cost_factor + '</a></td>';
+                                html += '<td><a href="#edit" onclick="openJob(\'' + x.job.id + '\');">' + x.job.minutes_round + '</a></td>';
+                            }
+
+                            html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
+                            html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
+
+                            if (x.is_active) {
+                                html += '<td>' + x.activity + '</td>';
+                                html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">';
+                                html += 'Deactivate</a> - <a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');">';
+                                html += '<i class="far fa-sticky-note"></i> Notes';
+                                html += '</a></td>';
+                            }
+                            else {
+                                html += "<td><input list='actions' id='action_" + x.job.id + "'/></td>";
+                                html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">Activate</a></td>';
+                            }
+
+                            html += '</tr>';
+                        });
+                        html += '</tbody>';
+                        html += '</table>';
+                        $('#jobs-tbl').html(html);
+                    } else {
+                        $.notify('invalid login', 'error');
+                        gotoState('login');
                     }
-
-                    html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
-                    html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
-
-                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a>' +
-                    (x.is_active ? ' - <a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>' : '') +
-                    '</td>';
-
-                    html += '</tr>';
                 });
-                html += '</tbody>';
-                html += '</table>';
-                $('#jobs-tbl').html(html);
-            } else {
-                $.notify('invalid login', 'error');
-                gotoState('login');
-            }
         });
 }
 
@@ -158,11 +184,16 @@ function openJob(id) {
 
 // trigger job
 function triggerJob(id) {
+    let actstr = '';
+    let qact = $('#action_' + id);
+    if (qact[0] != null) actstr = qact[0].value;
+
     $.post(urlbase + '/Api/TriggerJob',
         {
             username: username,
             password: password,
-            id_job: id
+            id_job: id,
+            activity: actstr
         },
         function (data, status, jqXHR) {
             if (checkApiError(data)) return;
@@ -227,7 +258,7 @@ $('.js-job-delete-btn').click(function (e) {
 
 // edit job notes
 function editJobNotes(id) {
-    loadJobNote(id);        
+    loadJobNote(id);
 }
 
 // close job

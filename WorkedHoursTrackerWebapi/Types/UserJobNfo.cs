@@ -13,6 +13,8 @@ namespace WorkedHoursTrackerWebapi
 
         public Job job { get; set; }
 
+        public string activity { get; set; }
+
         public DateTime trigger_timestamp { get; set; }
 
         public bool is_active { get; set; }

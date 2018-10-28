@@ -290,7 +290,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
 
                 var response = new ActivityListResponse();
 
-                response.activityList = ctx.Activities.ToList();                 
+                response.activityList = ctx.Activities.ToList();
 
                 return response;
             }
@@ -396,6 +396,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             public long id_job;
             public bool is_active;
+            public long id_activity;
             public DateTime trigger_timestamp;
         }
 
@@ -407,6 +408,15 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var response = new JobListResponse();
+
+                var qactivity_desc = ctx.Activities.ToDictionary(k => k.id, v => v.name);
+
+                Func<long, string> GetActivityDesc = (id_activity) =>
+                {
+                    string res = "";
+                    qactivity_desc.TryGetValue(id_activity, out res);
+                    return res;
+                };
 
                 var user = ctx.Users.First(w => w.username == username);
 
@@ -438,12 +448,13 @@ group by uj.id_job";
 
                     // retrieve is_active
                     query = $@"
-select a.id_job, a.is_active, a.trigger_timestamp from
+select a.id_job, a.is_active, a.trigger_timestamp, a.id_activity from
 (
 select
     uj.id_job,
     first(uj.is_active order by uj.trigger_timestamp desc) is_active,
-    first(uj.trigger_timestamp order by uj.trigger_timestamp desc) trigger_timestamp
+    first(uj.trigger_timestamp order by uj.trigger_timestamp desc) trigger_timestamp,
+    first(uj.id_activity order by uj.trigger_timestamp desc) id_activity
 from
     userjob uj
 where
@@ -466,6 +477,7 @@ group by id_job
                         {
                             r.is_active = jnfo.is_active;
                             r.trigger_timestamp = jnfo.trigger_timestamp;
+                            r.activity = GetActivityDesc(jnfo.id_activity);
 
                             r.total_hours = resTotalHours[job.id].GetValueOrDefault();
 
@@ -621,7 +633,7 @@ group by id_job
         #endregion
 
         [HttpPost]
-        public CommonResponse TriggerJob(string username, string password, int id_job)
+        public CommonResponse TriggerJob(string username, string password, int id_job, string activity)
         {
             try
             {
@@ -629,6 +641,8 @@ group by id_job
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
+
+                var qactivity = ctx.Activities.FirstOrDefault(w => w.name == activity);
 
                 var job = ctx.Jobs.First(w => w.id == id_job);
 
@@ -638,9 +652,17 @@ group by id_job
                 newEntry = new UserJob()
                 {
                     user = user,
+                    activity = qactivity,
                     job = job,
                     trigger_timestamp = DateTime.UtcNow
                 };
+
+                if (last == null || !last.is_active)
+                {
+                    if (qactivity == null) throw new Exception($"could find activity [{activity}]");
+                    newEntry.activity = qactivity;
+                }
+
                 if (last == null)
                 {
                     newEntry.is_active = true;

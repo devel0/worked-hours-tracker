@@ -16,6 +16,9 @@ namespace WorkedHoursTrackerWebapi
         [ForeignKey("id_user")]
         public User user { get; set; }
 
+        [ForeignKey("id_activity")]
+        public Activity activity { get; set; }
+
         [Required]
         [ForeignKey("id_job")]
         public Job job { get; set; }
