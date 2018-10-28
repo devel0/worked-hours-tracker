@@ -45,7 +45,7 @@ function gotoState(newstate) {
 
         case 'job-edit-note':
             {
-                showInnerPart('.js-main', '.js-main-job-edit-note');                
+                showInnerPart('.js-main', '.js-main-job-edit-note');
             }
             break;
 
@@ -100,6 +100,8 @@ function checkLogin() {
             if (checkApiSuccessful(data)) {
                 $.notify('logged in', 'success');
                 savePassword();
+                can_edit_activities = data.canEditActivities;
+                can_edit_jobs = data.canEditJobs;
                 gotoState('main');
             } else {
                 $.notify('invalid login', 'error');

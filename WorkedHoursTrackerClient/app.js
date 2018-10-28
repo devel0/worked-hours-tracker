@@ -8,6 +8,9 @@ password = '';
 username = sessionStorage.getItem('username');
 password = sessionStorage.getItem('password');
 
+can_edit_jobs = false;
+can_edit_activities = false;
+
 // caches loaded data
 let credshortlistdata = null;
 
@@ -59,6 +62,8 @@ $.post(
         if (checkApiInvalidAuth(data))
             gotoState('login');
         else {
+            can_edit_activities = data.canEditActivities;
+            can_edit_jobs = data.canEditJobs;
             gotoState('main');
         }
     }

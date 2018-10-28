@@ -632,9 +632,16 @@ group by id_job
         public CommonResponse IsAuthValid(string username, string password)
         {
             try
-            {
+            {                           
                 if (!CheckAuth(username, password)) return InvalidAuthResponse();
-                return SuccessfulResponse();
+
+                var res = new UserAuthNfoResponse();     
+
+                var q = ctx.Users.First(w=>w.username == username);
+                res.CanEditJobs = q.can_edit_jobs;
+                res.CanEditActivities = q.can_edit_activities;
+
+                return res;
             }
             catch (Exception ex)
             {
