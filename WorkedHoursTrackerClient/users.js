@@ -42,7 +42,8 @@ function clearUserEdit() {
     $('#user-edit-id')[0].value = '0';
     $('#user-edit-username-box')[0].value = '';
     $('#user-edit-password-box')[0].value = '';
-    $('#user-edit-cost-box')[0].value = '0';    
+    $('#user-edit-cost-box')[0].value = '0';   
+    $('#user-edit-can-edit-jobs')[0].value = false; 
 }
 
 function buildUserEditObj() {
@@ -50,7 +51,8 @@ function buildUserEditObj() {
         username: $('#user-edit-username-box')[0].value,
         password: $('#user-edit-password-box')[0].value,
         cost: $('#user-edit-cost-box')[0].value,
-        id: $('#user-edit-id')[0].value
+        id: $('#user-edit-id')[0].value,
+        can_edit_jobs: $('#user-edit-can-edit-jobs-checkbox')[0].checked
     };
 }
 
@@ -83,6 +85,7 @@ function openUser(id) {
                 $('#user-edit-password-box')[0].value = data.user.password;
                 $('#user-edit-cost-box')[0].value = data.user.cost;
                 $('#user-edit-id')[0].value = data.user.id;
+                $('#user-edit-can-edit-jobs-checkbox')[0].checked = data.user.can_edit_jobs;
 
                 userEditOrig = JSON.stringify(buildUserEditObj());
 

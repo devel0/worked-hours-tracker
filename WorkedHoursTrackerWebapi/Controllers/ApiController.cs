@@ -121,6 +121,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 user.username = jUser.username;
                 user.password = jUser.password?.Trim();
                 user.cost = jUser.cost;
+                if (username == "admin") user.can_edit_jobs = jUser.can_edit_jobs;
 
                 ctx.SaveChanges();
 
@@ -487,7 +488,7 @@ group by id_job
                             SetCell(row, col++, uj.hours_increment);
                             //SetCell(row, col++, uj.job.Cost(uj.hours_increment, u.cost));
                             // Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost);
-                            cell = ws.Cell(row,col++);                            
+                            cell = ws.Cell(row, col++);
                             cell.FormulaR1C1 = "=MAX(RC[-8]+MROUND(RC[-1]*60,RC[-5])/60*RC[-3]*RC[-6],RC[-7])";
                             SetCell(row, col++, uj.notes);
                         }
