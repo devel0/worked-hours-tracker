@@ -85,7 +85,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 // todo : autoban
             }
 
-            return (is_valid, qdb.can_edit_jobs, qdb.can_edit_jobs);
+            return (is_valid, username == "admin" || qdb.can_edit_jobs, username == "admin" || qdb.can_edit_activities);
         }
         #endregion
 
@@ -650,7 +650,10 @@ group by id_job
 
                 var job = ctx.Jobs.First(w => w.id == id_job);
 
-                var last = ctx.UserJobs.Where(r => r.user.id == id_user && r.job.id == id_job).OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
+                var last = ctx.UserJobs
+                .Include("activity")
+                .Where(r => r.user.id == id_user && r.job.id == id_job)
+                .OrderByDescending(w => w.trigger_timestamp).FirstOrDefault();
 
                 UserJob newEntry = null;
                 newEntry = new UserJob()
@@ -679,6 +682,7 @@ group by id_job
                             {
                                 newEntry.is_active = false;
                                 newEntry.hours_increment = (newEntry.trigger_timestamp - last.trigger_timestamp).TotalHours;
+                                newEntry.activity = last.activity;
                             }
                             break;
 
