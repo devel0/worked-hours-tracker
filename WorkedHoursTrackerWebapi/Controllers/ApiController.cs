@@ -548,7 +548,8 @@ group by id_job
 
             using (var wb = new XLWorkbook())
             {
-                var ws = wb.AddWorksheet("report");
+                var wspivot = wb.AddWorksheet("summary");
+                var ws = wb.AddWorksheet("detail");
 
                 var col = 1;
                 var row = 1;
@@ -618,6 +619,15 @@ group by id_job
                     }
                 }
                 FinalizeWorksheet(ws);
+                
+                // https://github.com/ClosedXML/ClosedXML/wiki/Pivot-Table-example/9c7bf53d9f483ee1b2281e9cd369fe3fd06caa2c
+                var pt = wspivot.PivotTables.Add("pivot", wspivot.Cell(1, 1), ws.RangeUsed());
+
+                pt.ReportFilters.Add("Job");
+                pt.RowLabels.Add("User");
+                pt.ColumnLabels.Add("Activity");
+                pt.Values.Add("hours");
+                pt.Values.Add("cost");                
 
                 wb.SaveAs(pathfilename);
             }
@@ -639,7 +649,9 @@ group by id_job
         [HttpPost]
         public CommonResponse TriggerJob(string username, string password, int id_job, string activity)
         {
+#if !DEBUG
             try
+#endif
             {
                 if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
@@ -698,10 +710,12 @@ group by id_job
 
                 return SuccessfulResponse();
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 return ErrorResponse(ex.Message);
             }
+#endif
         }
 
         [HttpPost]
