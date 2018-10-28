@@ -83,8 +83,8 @@ function reloadJobs() {
                     html += '<td><span id="jtot_' + x.job.id + '">' + x.total_hours.toFixed(2) + '</span></td>';
                     html += '<td><span id="j24_' + x.job.id + '">' + x.last_24_hours.toFixed(2) + '</span></td>';
 
-                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a> - ' +
-                        '<a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>'
+                    html += '<td><a href="#edit" onclick="triggerJob(\'' + x.job.id + '\');">' + (x.is_active ? "Deactivate" : "Activate") + '</a>' +
+                    (x.is_active ? ' - <a href="#edit" onclick="editJobNotes(\'' + x.job.id + '\');"><i class="far fa-sticky-note"></i> Notes</a>' : '') +
                     '</td>';
 
                     html += '</tr>';
