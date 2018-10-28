@@ -36,6 +36,16 @@ namespace WorkedHoursTrackerWebapi
         /// </summary>
         public DateTime? last_login_timestamp { get; set; }
 
+        /// <summary>
+        /// enable normal user to edit jobs
+        /// </summary>
+        public bool can_edit_jobs { get; set; }
+
+        /// <summary>
+        /// enable normal user to edit activities
+        /// </summary>
+        public bool can_edit_activities { get; set; }
+
     }
 
 }
