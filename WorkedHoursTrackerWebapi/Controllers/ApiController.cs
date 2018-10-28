@@ -568,6 +568,7 @@ group by id_job
                     cell.Style.Font.SetBold();
                 };
 
+                SetCellBold(row, col++, "Activity");
                 SetCellBold(row, col++, "Job");
                 SetCellBold(row, col++, "Cost(base)");
                 SetCellBold(row, col++, "Cost(min)");
@@ -586,7 +587,9 @@ group by id_job
 
                 foreach (var u in users) // loop over users
                 {
-                    var quserjobs = ctx.UserJobs.Where(r => r.user.id == u.id).OrderBy(w => w.trigger_timestamp).ToList();
+                    var quserjobs = ctx.UserJobs
+                    .Include("activity")
+                    .Where(r => r.user.id == u.id).OrderBy(w => w.trigger_timestamp).ToList();
 
                     foreach (var uj in quserjobs) // loop over user jobs
                     {
@@ -595,6 +598,7 @@ group by id_job
                             ++row;
                             col = 1;
 
+                            SetCell(row, col++, uj.activity?.name);
                             SetCell(row, col++, uj.job.name);
                             SetCell(row, col++, uj.job.base_cost);
                             SetCell(row, col++, uj.job.min_cost);
