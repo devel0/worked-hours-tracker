@@ -68,7 +68,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
             };
         }
 
-        bool CheckAuth(string username, string password)
+        (bool authValid, bool canEditJobs, bool canEditActivities)
+        CheckAuth(string username, string password)
         {
             var qdb = ctx.Users.FirstOrDefault(w => w.username == username);
 
@@ -84,7 +85,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 // todo : autoban
             }
 
-            return is_valid;
+            return (is_valid, qdb.can_edit_jobs, qdb.can_edit_jobs);
         }
         #endregion
 
@@ -96,7 +97,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             try
             {
                 // disallow non admin
-                if (jUser == null || username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                if (jUser == null || username != "admin" || !CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 User user = null;
 
@@ -143,7 +144,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             try
             {
                 // disallow non admin
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var response = new UserResponse();
 
@@ -163,7 +164,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             try
             {
                 // disallow non admin
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var q = ctx.Users.FirstOrDefault(w => w.id == id);
                 if (q != null)
@@ -186,7 +187,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             try
             {
                 // disallow non admin
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                if (username != "admin" || !CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var response = new UserListResponse();
 
@@ -209,7 +210,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditJobs) return InvalidAuthResponse();
 
                 Job job = null;
                 if (jJob.id == 0)
@@ -246,7 +248,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditJobs) return InvalidAuthResponse();
 
                 var response = new ContactInfoResponse();
 
@@ -265,7 +268,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (username != "admin" || !CheckAuth(username, password)) return InvalidAuthResponse();
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditJobs) return InvalidAuthResponse();
 
                 var q = ctx.Jobs.FirstOrDefault(w => w.id == id_job);
 
@@ -301,7 +305,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var response = new JobListResponse();
 
@@ -427,7 +431,7 @@ group by id_job
         [HttpGet]
         public async Task<IActionResult> DownloadReport(string username, string password)
         {
-            if (username != "admin" || !CheckAuth(username, password)) return null;
+            if (username != "admin" || !CheckAuth(username, password).authValid) return null;
 
             var pathfilename = System.IO.Path.GetTempFileName() + ".xlsx";
 
@@ -522,7 +526,7 @@ group by id_job
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -576,7 +580,7 @@ group by id_job
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -605,7 +609,7 @@ group by id_job
         {
             try
             {
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
                 var user = ctx.Users.First(w => w.username == username);
                 var id_user = user.id;
@@ -632,12 +636,12 @@ group by id_job
         public CommonResponse IsAuthValid(string username, string password)
         {
             try
-            {                           
-                if (!CheckAuth(username, password)) return InvalidAuthResponse();
+            {
+                if (!CheckAuth(username, password).authValid) return InvalidAuthResponse();
 
-                var res = new UserAuthNfoResponse();     
+                var res = new UserAuthNfoResponse();
 
-                var q = ctx.Users.First(w=>w.username == username);
+                var q = ctx.Users.First(w => w.username == username);
                 res.CanEditJobs = q.can_edit_jobs;
                 res.CanEditActivities = q.can_edit_activities;
 
