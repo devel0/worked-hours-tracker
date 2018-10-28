@@ -121,7 +121,11 @@ namespace WorkedHoursTrackerWebapi.Controllers
                 user.username = jUser.username;
                 user.password = jUser.password?.Trim();
                 user.cost = jUser.cost;
-                if (username == "admin") user.can_edit_jobs = jUser.can_edit_jobs;
+                if (username == "admin")
+                {
+                    user.can_edit_jobs = jUser.can_edit_jobs;
+                    user.can_edit_activities = jUser.can_edit_activities;
+                }
 
                 ctx.SaveChanges();
 
