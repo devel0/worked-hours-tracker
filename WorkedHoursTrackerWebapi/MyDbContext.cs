@@ -120,6 +120,8 @@ namespace WorkedHoursTrackerWebapi
         public DbSet<Job> Jobs { get; set; }
 
         public DbSet<UserJob> UserJobs { get; set; }
+
+        public DbSet<activity> Activities { get; set; }
     }
 
 }
