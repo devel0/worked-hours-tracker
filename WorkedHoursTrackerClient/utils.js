@@ -61,6 +61,11 @@ function gotoState(newstate) {
             }
             break;
 
+        case 'job-revise':
+            {
+                showInnerPart('.js-main', '.js-main-job-revise');
+            }
+            break;
     }
 }
 

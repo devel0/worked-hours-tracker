@@ -201,7 +201,7 @@
               <input type="hidden" id="activity-edit-id" />
               <input type="text" class="form-control" id="activity-edit-name-box" />
             </div>
-          </div>           
+          </div>
 
           <!-- Description -->
           <div class="row mt-3">
@@ -312,6 +312,81 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <div class="row js-main-job-revise js-inner-part collapse">
+        <div class="col">
+          <br />
+          <h2>Activity revise</h2>
+
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-success js-job-revise-save-btn">
+                <i class="fas fa-save"></i> Save changes</button>
+              <button type="button" class="btn btn-danger js-job-revise-delete-btn">
+                <i class="fas fa-trash"></i> Remove</button>
+              <button type="button" class="btn btn-light js-job-revise-discard-btn">
+                <i class="fas fa-times"></i> Close</button>
+            </div>
+          </div>
+
+          <!-- Job -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="job-revise-name-box">
+                <b>Job</b>
+            </div>
+            <div class="col">
+              <input type="hidden" id="job-revise-id-from" />
+              <input type="hidden" id="job-revise-id-to" />
+              <input type="text" readonly class="form-control" id="job-revise-name-box" />
+            </div>
+          </div>
+
+           <!-- Activity -->
+           <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="job-revise-activity-box">
+                <b>Activity</b>
+            </div>
+            <div class="col">              
+              <input type="text" readonly class="form-control" id="job-revise-activity-box" />
+            </div>
+          </div>
+
+          <!-- Start -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="job-revise-from">
+                <b>Start</b>
+            </div>
+            <div class="col">              
+              <input type="datetime-local" step="1" class="form-control" id="job-revise-from" />
+            </div>
+          </div>          
+
+          <!-- End -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="job-revise-to">
+                <b>End</b>
+            </div>
+            <div class="col">              
+              <input type="datetime-local" step="1" class="form-control" id="job-revise-to" />
+            </div>
+          </div>  
+
+          <!-- Notes -->
+          <div class="row mt-3">
+            <div class="col-2 text-right">
+              <label for="job-revise-notes-box">
+                <b>Notes</b>
+            </div>
+            <div class="col editor">
+              <textarea class="form-control" id="job-revise-notes-box" rows="10" placeholder="Write notes here"></textarea>
+            </div>
+          </div>
 
         </div>
       </div>

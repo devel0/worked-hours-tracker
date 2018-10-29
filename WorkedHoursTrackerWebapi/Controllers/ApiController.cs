@@ -68,6 +68,21 @@ namespace WorkedHoursTrackerWebapi.Controllers
             };
         }
 
+        /// <summary>
+        /// manages npgsql.postgresexception
+        /// </summary>
+        CommonResponse ErrorResponse(Exception ex)
+        {
+            var errMsg = ex.Message;
+
+            if (ex.InnerException != null && ex.InnerException is Npgsql.PostgresException)
+            {
+                errMsg = (ex.InnerException as Npgsql.PostgresException).Message;
+            }
+
+            return ErrorResponse(errMsg);
+        }
+
         (bool authValid, bool canEditJobs, bool canEditActivities)
         CheckAuth(string username, string password)
         {
@@ -134,7 +149,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -154,7 +169,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -177,7 +192,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -197,7 +212,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -233,7 +248,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -253,7 +268,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -277,7 +292,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -296,7 +311,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -338,7 +353,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -358,7 +373,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -382,7 +397,7 @@ namespace WorkedHoursTrackerWebapi.Controllers
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -513,7 +528,7 @@ group by id_job
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -590,7 +605,9 @@ group by id_job
                 {
                     var quserjobs = ctx.UserJobs
                     .Include("activity")
-                    .Where(r => r.user.id == u.id).OrderBy(w => w.trigger_timestamp).ToList();
+                    .Include("parent")
+                    .Where(r => r.user.id == u.id)
+                    .OrderBy(w => w.trigger_timestamp).ToList();
 
                     foreach (var uj in quserjobs) // loop over user jobs
                     {
@@ -614,12 +631,17 @@ group by id_job
                             // Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost);
                             cell = ws.Cell(row, col++);
                             cell.FormulaR1C1 = "=MAX(RC[-8]+MROUND(RC[-1]*60,RC[-5])/60*RC[-3]*RC[-6],RC[-7])";
-                            SetCell(row, col++, uj.notes);
+
+                            var notes = uj.notes;
+                            if (uj.parent != null) // retrieve notes from when was active
+                                notes = uj.parent.notes;
+
+                            SetCell(row, col++, notes);
                         }
                     }
                 }
                 FinalizeWorksheet(ws);
-                
+
                 // https://github.com/ClosedXML/ClosedXML/wiki/Pivot-Table-example/9c7bf53d9f483ee1b2281e9cd369fe3fd06caa2c
                 var pt = wspivot.PivotTables.Add("pivot", wspivot.Cell(1, 1), ws.RangeUsed());
 
@@ -627,7 +649,7 @@ group by id_job
                 pt.RowLabels.Add("User");
                 pt.ColumnLabels.Add("Activity");
                 pt.Values.Add("hours");
-                pt.Values.Add("cost");                
+                pt.Values.Add("cost");
 
                 wb.SaveAs(pathfilename);
             }
@@ -705,6 +727,8 @@ group by id_job
                             break;
                     }
                 }
+                if (!newEntry.is_active) newEntry.parent = last;
+
                 ctx.UserJobs.Add(newEntry);
                 ctx.SaveChanges();
 
@@ -742,7 +766,7 @@ group by id_job
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 
@@ -769,9 +793,145 @@ group by id_job
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
+
+        #endregion
+
+        #region REVISE JOB
+
+        [HttpPost]
+        public CommonResponse SaveJobRevise(string username, string password, ReviseJobNfo jJobRevise)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditJobs) return InvalidAuthResponse();
+
+                if (jJobRevise.from > jJobRevise.to) throw new Exception($"End datetime must greather than Start");
+                if (jJobRevise.from > DateTime.Now || jJobRevise.to > DateTime.Now) throw new Exception($"date can't in future");
+
+                var user = ctx.Users.First(w => w.username == username);
+                var id_user = user.id;
+
+                var juFrom = ctx.UserJobs
+                .Include("job")
+                .Include("activity")
+                .FirstOrDefault(w => w.id == jJobRevise.id_user_job_from && w.user.id == id_user);
+
+                var juTo = ctx.UserJobs
+                .Include("job")
+                .Include("activity")
+                .FirstOrDefault(w => w.id == jJobRevise.id_user_job_to && w.user.id == id_user);
+
+                if (juFrom == null || juTo == null) throw new Exception($"unauthorized modify");
+
+                juFrom.trigger_timestamp = jJobRevise.from;
+                juFrom.notes = jJobRevise.notes;
+
+                juTo.trigger_timestamp = jJobRevise.to;
+                juTo.hours_increment = (juTo.trigger_timestamp - juFrom.trigger_timestamp).TotalHours;
+
+                ctx.SaveChanges();
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse DeleteJobRevise(string username, string password, ReviseJobNfo jJobRevise)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid || !qa.canEditJobs) return InvalidAuthResponse();
+
+                var user = ctx.Users.First(w => w.username == username);
+                var id_user = user.id;
+
+                var juFrom = ctx.UserJobs
+                .Include("job")
+                .Include("activity")
+                .FirstOrDefault(w => w.id == jJobRevise.id_user_job_from && w.user.id == id_user);
+
+                var juTo = ctx.UserJobs
+                .Include("job")
+                .Include("activity")
+                .FirstOrDefault(w => w.id == jJobRevise.id_user_job_to && w.user.id == id_user);
+
+                if (juFrom == null || juTo == null) throw new Exception($"unauthorized modify");                
+
+                ctx.UserJobs.Remove(juTo);
+                ctx.SaveChanges();
+
+                ctx.UserJobs.Remove(juFrom);
+                ctx.SaveChanges();
+
+                return SuccessfulResponse();
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex);
+            }
+        }
+
+        [HttpPost]
+        public CommonResponse LoadReviseJob(string username, string password, int id_job, DateTime? _beforeThan)
+        {
+            try
+            {
+                var qa = CheckAuth(username, password);
+                if (!qa.authValid) return InvalidAuthResponse();
+
+                var user = ctx.Users.First(w => w.username == username);
+                var id_user = user.id;
+
+                var response = new ReviseJobNfo();
+
+                response.job = ctx.Jobs.FirstOrDefault(w => w.id == id_job);
+
+                //UserJob qfrom = null;
+                //UserJob qTo = null;
+
+                DateTime beforeThan = DateTime.UtcNow;
+
+                if (_beforeThan != null) beforeThan = _beforeThan.Value;
+
+                var qfrom = ctx.UserJobs
+                .Where(r => r.user.id == id_user && r.job.id == id_job && r.is_active == true && r.trigger_timestamp < beforeThan)
+                .OrderByDescending(w => w.trigger_timestamp)
+                .FirstOrDefault();
+
+                var afterThan = qfrom.trigger_timestamp;
+
+                var qto = ctx.UserJobs
+                .Include("activity")
+                .Where(r => r.user.id == id_user && r.job.id == id_job && r.is_active == false && r.trigger_timestamp < beforeThan && r.trigger_timestamp > afterThan)
+                .OrderByDescending(w => w.trigger_timestamp)
+                .FirstOrDefault();
+
+                if (qfrom == null || qto == null) throw new Exception($"could find any inserted activity to revise");
+
+                response.activity = qto.activity.name;
+                response.from = qfrom.trigger_timestamp;
+                response.id_user_job_from = qfrom.id;
+                response.to = qto.trigger_timestamp;
+                response.id_user_job_to = qto.id;
+                response.notes = qfrom.notes;
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ErrorResponse(ex);
+            }
+        }
+
 
         #endregion
 
@@ -792,7 +952,7 @@ group by id_job
             }
             catch (Exception ex)
             {
-                return ErrorResponse(ex.Message);
+                return ErrorResponse(ex);
             }
         }
 

@@ -22,6 +22,9 @@ namespace WorkedHoursTrackerWebapi
         [Required]
         [ForeignKey("id_job")]
         public Job job { get; set; }
+        
+        [ForeignKey("id_parent")]
+        public UserJob parent { get; set; }
 
         [Required]
         public DateTime trigger_timestamp { get; set; }
@@ -35,6 +38,9 @@ namespace WorkedHoursTrackerWebapi
         [Required]
         public double hours_increment { get; set; }
 
+        /// <summary>
+        /// available when job active
+        /// </summary>
         public string notes { get; set; }
 
     }
