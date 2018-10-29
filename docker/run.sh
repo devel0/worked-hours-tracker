@@ -31,4 +31,5 @@ docker run \
 	--restart="unless-stopped" \
 	--cpus="$cpus" \
 	--memory="$memory" \
+	--volume="$exdir/Migrations:/src/WorkedHoursTrackerWebapi/Migrations" \
 	"$container_image"
