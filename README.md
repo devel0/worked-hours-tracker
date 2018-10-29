@@ -8,8 +8,9 @@ web tracker of worked hours
   - create user
   - edit job
   - download report
+- activities
 - user
-  - toggle work
+  - toggle work by specifying an associated activity
   - notes can be inserted when job toggled on and will reported in the report
 - [user](WorkedHoursTrackerWebapi/Types/User.cs) properties
   - cost ( hour cost )
@@ -84,6 +85,12 @@ dotnet ef database update
 
 ![img](doc/Selection_095.png)
 
+**Activities view**
+
+![img](doc/Selection_049.png)
+
+**Activities edit**
+
 **User edit**
 
 ![img](doc/Selection_096.png)
@@ -93,6 +100,8 @@ dotnet ef database update
 ![img](doc/Selection_097.png)
 
 **Worked hours report**
+
+![img](doc/Selection_051.png)
 
 ![img](doc/Selection_099.png)
 
