@@ -577,6 +577,11 @@ group by id_job
                     cell.Value = v;
                 };
 
+                Action SetCell2Decimal = () =>
+                {
+                    cell.Style.NumberFormat.Format = "0.00";
+                };
+
                 Action<int, int, object> SetCellBold = (r, c, v) =>
                 {
                     cell = ws.Cell(r, c);
@@ -592,11 +597,12 @@ group by id_job
                 SetCellBold(row, col++, "Minutes round");
 
                 SetCellBold(row, col++, "User");
-                SetCellBold(row, col++, "cost/h");
-                SetCellBold(row, col++, "date");
-                SetCellBold(row, col++, "hours");
-                SetCellBold(row, col++, "cost");
-                SetCellBold(row, col++, "notes");
+                SetCellBold(row, col++, "Cost/h");
+                SetCellBold(row, col++, "From");
+                SetCellBold(row, col++, "To");
+                SetCellBold(row, col++, "Hours");
+                SetCellBold(row, col++, "Cost");
+                SetCellBold(row, col++, "Notes");
 
                 var users = ctx.Users.ToList();
                 ctx.Jobs.Load();
@@ -625,12 +631,17 @@ group by id_job
 
                             SetCell(row, col++, u.username);
                             SetCell(row, col++, u.cost);
-                            SetCell(row, col++, uj.trigger_timestamp);
-                            SetCell(row, col++, uj.hours_increment);
+                            if (uj.parent != null)
+                                SetCell(row, col++, uj.parent.trigger_timestamp.ToLocalTime());
+                            else
+                                ++col;
+                            SetCell(row, col++, uj.trigger_timestamp.ToLocalTime());
+                            SetCell(row, col++, uj.hours_increment); SetCell2Decimal();
                             //SetCell(row, col++, uj.job.Cost(uj.hours_increment, u.cost));
                             // Max(base_cost + (hours * 60).MRound(minutes_round) / 60 * hourCost * cost_factor, min_cost);
                             cell = ws.Cell(row, col++);
-                            cell.FormulaR1C1 = "=MAX(RC[-8]+MROUND(RC[-1]*60,RC[-5])/60*RC[-3]*RC[-6],RC[-7])";
+                            cell.FormulaR1C1 = "=MAX(RC[-9]+MROUND(RC[-1]*60,RC[-6])/60*RC[-4]*RC[-7],RC[-8])";
+                            SetCell2Decimal();
 
                             var notes = uj.notes;
                             if (uj.parent != null) // retrieve notes from when was active
@@ -648,8 +659,8 @@ group by id_job
                 pt.ReportFilters.Add("Job");
                 pt.RowLabels.Add("User");
                 pt.ColumnLabels.Add("Activity");
-                pt.Values.Add("hours");
-                pt.Values.Add("cost");
+                pt.Values.Add("Hours");
+                pt.Values.Add("Cost");
 
                 wb.SaveAs(pathfilename);
             }
@@ -864,7 +875,7 @@ group by id_job
                 .Include("activity")
                 .FirstOrDefault(w => w.id == jJobRevise.id_user_job_to && w.user.id == id_user);
 
-                if (juFrom == null || juTo == null) throw new Exception($"unauthorized modify");                
+                if (juFrom == null || juTo == null) throw new Exception($"unauthorized modify");
 
                 ctx.UserJobs.Remove(juTo);
                 ctx.SaveChanges();
