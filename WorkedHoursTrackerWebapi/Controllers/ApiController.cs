@@ -86,6 +86,8 @@ namespace WorkedHoursTrackerWebapi.Controllers
         (bool authValid, bool canEditJobs, bool canEditActivities)
         CheckAuth(string username, string password)
         {
+            if (username == null || password == null) return (false, false, false);
+
             var qdb = ctx.Users.FirstOrDefault(w => w.username == username);
 
             var is_valid = qdb != null && qdb.password == password;
