@@ -43,8 +43,8 @@ function clearUserEdit() {
     $('#user-edit-username-box')[0].value = '';
     $('#user-edit-password-box')[0].value = '';
     $('#user-edit-cost-box')[0].value = '0';   
-    $('#user-edit-can-edit-jobs')[0].value = false; 
-    $('#user-edit-can-edit-activities')[0].value = false; 
+    $('#user-edit-can-edit-jobs-checkbox')[0].value = false; 
+    $('#user-edit-can-edit-activities-checkbox')[0].value = false; 
 }
 
 function buildUserEditObj() {
