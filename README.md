@@ -45,7 +45,7 @@ cd docker
 ./run.sh
 ```
 
-- configure nginx [example](https://github.com/devel0/knowledge/blob/master/webdevel/nginx-webapi-conf.md)
+- configure nginx [example](https://github.com/devel0/knowledge/blob/master/doc/nginx-webapi-conf.md)
 
 ## development
 
